@@ -15,8 +15,8 @@ services:
     command: sleep infinity
     environment:
       # Uncomment this after skeleton, only for testing purposes at the moment
-      # FLASH_APP: service:app
-      FLASK_APP: app
+      FLASH_APP: service:app
+      #FLASK_APP: app
       FLASK_ENV: development
       DATABASE_URI: postgresql://postgres:postgres@postgres:5432/postgres
     networks:
@@ -27,7 +27,7 @@ services:
   postgres:
     image: postgres:alpine
     ports:
-      - 5432:5432
+      - 5432
     environment:
       POSTGRES_PASSWORD: postgres
     volumes:
