@@ -13,6 +13,8 @@ from service import status  # HTTP Status Codes
 from service.models import db
 from service.routes import app, init_db
 
+from .factories import CustomerFactory
+
 # Disable all but critical errors during normal test run
 # uncomment for debugging failing tests
 logging.disable(logging.CRITICAL)
