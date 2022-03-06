@@ -13,6 +13,7 @@ DELETE /customers/{id} - deletes a Customer record in the database
 import os
 import sys
 import logging
+from werkzeug.exceptions import NotFound
 from flask import Flask, jsonify, request, url_for, make_response, abort
 from . import status  # HTTP Status Codes
 
@@ -35,11 +36,11 @@ def index():
         jsonify(
             name="Customer Demo REST API Service",
             version="1.0",
-            paths=url_for("list_customers", _external=True),
+            #paths=url_for("list_customers", _external=True),
         ),
         status.HTTP_200_OK,
     )
-
+'''
 ######################################################################
 # LIST ALL CUSTOMERS
 ######################################################################
@@ -49,7 +50,7 @@ def list_customers():
 
     return None
 
-
+'''
 ######################################################################
 # RETRIEVE A CUSTOMER
 ######################################################################
@@ -60,8 +61,13 @@ def get_customers(customer_id):
 
     This endpoint will return a Customer based on it's id
     """
-    
-    return None
+    app.logger.info("Request for customer with id: %s", customer_id)
+    customer = Customer.find(customer_id)
+    if not customer:
+        raise NotFound("Customer with id '{}' was not found.".format(customer_id))
+
+    app.logger.info("Returning customer: %s", customer.first_name)
+    return make_response(jsonify(customer.serialize()), status.HTTP_200_OK)
 
 ######################################################################
 # ADD A NEW CUSTOMER
@@ -72,10 +78,20 @@ def create_customers():
     Creates a Customer
     This endpoint will create a Customer based the data in the body that is posted
     """
-    
-    return None
+    app.logger.info("Request to create a customer")
+    check_content_type("application/json")
+    customer = Customer()
+    customer.deserialize(request.get_json())
+    customer.create()
+    message = customer.serialize()
+    location_url = url_for("get_customers", customer_id=customer.id, _external=True)
 
+    app.logger.info("Customer with ID [%s] created.", customer.id)
+    return make_response(
+        jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
+    )
 
+'''
 ######################################################################
 # UPDATE AN EXISTING CUSTOMER
 ######################################################################
@@ -142,7 +158,7 @@ def delete_customers_addresses(customer_id):
     """
     
     return None
-
+'''
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
@@ -152,3 +168,14 @@ def init_db():
     """ Initializes the SQLAlchemy app """
     global app
     Customer.init_db(app)
+
+def check_content_type(media_type):
+    """Checks that the media type is correct"""
+    content_type = request.headers.get("Content-Type")
+    if content_type and content_type == media_type:
+        return
+    app.logger.error("Invalid Content-Type: %s", content_type)
+    abort(
+        status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+        "Content-Type must be {}".format(media_type),
+    )

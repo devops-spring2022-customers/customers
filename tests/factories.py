@@ -32,5 +32,6 @@ class CustomerFactory(factory.Factory):
     last_name = FuzzyChoice(choices=["zhang", "doshi", "rofrano", "patel"])
     userid = FuzzyChoice(choices=["devops2022", "customers2022", "random2022", "username2022"])
     password = factory.Faker("password")
-    addresses = FuzzyChoice(choices=[[factory.Faker("address"),factory.Faker("address")], [factory.Faker("address")], 
-                                        [factory.Faker("address"), factory.Faker("address"), factory.Faker("address")]])
+    addresses = FuzzyChoice(choices=[["test1", "test2"], ["test1"], ["test1", "test2", "test3"]])
+    # addresses = FuzzyChoice(choices=[[factory.Faker("street_name"),factory.Faker("street_name")], [factory.Faker("street_name")], 
+    #                                     [factory.Faker("street_name"), factory.Faker("street_name"), factory.Faker("street_name")]])
