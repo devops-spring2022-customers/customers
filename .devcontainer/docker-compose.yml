@@ -14,10 +14,9 @@ services:
       - ..:/app
     command: sleep infinity
     environment:
-      # Uncomment this after skeleton, only for testing purposes at the moment
       FLASH_APP: service:app
-      #FLASK_APP: app
       FLASK_ENV: development
+      GUNICORN_BIND: "0.0.0.0:8000"
       DATABASE_URI: postgresql://postgres:postgres@postgres:5432/postgres
     networks:
       - dev
