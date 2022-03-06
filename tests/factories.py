@@ -17,7 +17,7 @@ Test Factory to make fake objects for testing
 """
 import factory
 from factory.fuzzy import FuzzyChoice
-from service.models import Pet, Gender
+from service.models import Customer
 
 
 class CustomerFactory(factory.Factory):
@@ -25,7 +25,7 @@ class CustomerFactory(factory.Factory):
 
     class Meta:  # pylint: disable=too-few-public-methods
         """Maps factory to data model"""
-        model = Pet
+        model = Customer
 
     id = factory.Sequence(lambda n: n)
     first_name = FuzzyChoice(choices=["chensong", "yueteng", "bohan", "harsh", "Jash"])
