@@ -189,3 +189,10 @@ class TestCustomerModel(unittest.TestCase):
         data["addresses"] = "abc"
         customer = Customer()
         self.assertRaises(DataValidationError, customer.deserialize, data)
+    
+    def test_list_all(self):
+        """Test case to list all customers"""
+        customers = CustomerFactory.create_batch(3)
+        for customer in customers:
+            customer.create()
+        self.assertEqual(len(Customer.all()), 3)

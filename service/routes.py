@@ -13,6 +13,7 @@ DELETE /customers/{id} - deletes a Customer record in the database
 import os
 import sys
 import logging
+import json
 from werkzeug.exceptions import NotFound
 from flask import Flask, jsonify, request, url_for, make_response, abort
 from . import status  # HTTP Status Codes
@@ -40,17 +41,25 @@ def index():
         ),
         status.HTTP_200_OK,
     )
-'''
+
 ######################################################################
 # LIST ALL CUSTOMERS
 ######################################################################
 @app.route("/customers", methods=["GET"])
 def list_customers():
     """Returns all of the customer"""
+    app.logger.info('Request to list Customers...')
+    customer = Customer.all()
+    customer_list = [x.serialize() for x in customer]
+    new_dict = {}
+    for item in customer_list:
+        name = item['id']
+        new_dict[name] = item
+    return new_dict, status.HTTP_200_OK
 
-    return None
+    #return None
 
-'''
+
 ######################################################################
 # RETRIEVE A CUSTOMER
 ######################################################################

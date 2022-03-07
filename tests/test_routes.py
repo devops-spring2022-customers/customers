@@ -183,3 +183,11 @@ class TestCustomerServer(TestCase):
             BASE_URL+"s", json=test_customer.serialize(), content_type=CONTENT_TYPE_JSON
         )
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+    
+    def test_get_all(self):
+        """Get all customers"""
+        self._create_customers(3)
+        res = self.app.get(BASE_URL)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        res_data = res.get_json()
+        self.assertEqual(len(res_data),3)
