@@ -155,12 +155,18 @@ class Customer(db.Model):
 
         logger.info("Processing lookup for id %s ...", by_id)
         return cls.query.get(by_id)
-    '''
-    # To be implemented
+
+
+  
     @classmethod
     def find_or_404(cls, by_id):
         """ Find a Customer by its id """
 
+        cls.logger.info("Processing lookup for id %s ...", by_id)
+        return cls.query.get(by_id)
+
+
+    '''
     @classmethod
     def find_by_first_name(cls, first_name):
         """Returns all Customer with the given first name
