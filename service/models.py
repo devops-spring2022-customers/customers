@@ -48,14 +48,18 @@ class Customer(db.Model):
         db.session.add(self)
         db.session.commit()
 
-    '''
+    
     # To be implemented
 
     def update(self):
         """
         Updates a Customer to the database
         """
+        if not self.id:
+            raise DataValidationError("Update called with empty ID field")
+        db.session.commit()
 
+    '''
     def delete(self):
         """ Removes a Customer from the data store """
     '''
