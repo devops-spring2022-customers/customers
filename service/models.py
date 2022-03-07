@@ -32,36 +32,33 @@ class Customer(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(63), nullable=False)
     last_name = db.Column(db.String(63), nullable=False)
-    userid = db.Column(db.String(63))
-    password = db.Column(db.String(63))
-    addresses = db.Column(db.ARRAY(db.String(63)))
+    userid = db.Column(db.String(63), nullable=True)
+    password = db.Column(db.String(63), nullable=True)
+    addresses = db.Column(db.ARRAY(db.String(63)), nullable=False)
 
     def __repr__(self):
-        return "<Customer %r id=[%s]>" % (self.name, self.id)
+        return "<Customer %r id=[%s]>" % (self.first_name, self.id)
 
     def create(self):
         """
         Creates a Customer to the database
         """
-        logger.info("Creating %s", self.name)
+        logger.info("Creating %s", self.first_name)
         self.id = None  # id must be none to generate next primary key
         db.session.add(self)
         db.session.commit()
+
+    '''
+    # To be implemented
 
     def update(self):
         """
         Updates a Customer to the database
         """
-        logger.info("Saving %s", self.name)
-        if not self.id:
-            raise DataValidationError("Update called with empty ID field")
-        db.session.commit()
 
     def delete(self):
         """ Removes a Customer from the data store """
-        logger.info("Deleting %s", self.name)
-        db.session.delete(self)
-        db.session.commit()
+    '''
 
     def serialize(self):
         """ Serializes a Customer into a dictionary """
@@ -82,11 +79,44 @@ class Customer(db.Model):
             data (dict): A dictionary containing the resource data
         """
         try:
-            self.first_name = data["first_name"]
-            self.last_name = data["last_name"]
+            if isinstance(data["first_name"], str):
+                self.first_name = data["first_name"]
+            else:
+                raise DataValidationError(
+                    "Invalid type for string [first_name]: "
+                    + str(type(data["first_name"]))
+                )
+            if isinstance(data["last_name"], str):
+                self.last_name = data["last_name"]
+            else:
+                raise DataValidationError(
+                    "Invalid type for string [last_name]: "
+                    + str(type(data["last_name"]))
+                )    
+            
             self.userid = data["userid"]
             self.password = data["password"]
-            self.addresses = data["addresses"]
+
+            if isinstance(data["addresses"], list):
+                if len(data["addresses"]) > 0:
+                    for addr in data["addresses"]:
+                        if not isinstance(addr, str):
+                            raise DataValidationError(
+                                "Invalid type for address for string [addresses]: "
+                                + str(type(data["addresses"]))
+                            )
+                    self.addresses = data["addresses"]
+                else:
+                    raise DataValidationError(
+                        "Invalid number of addresses for list [addresses]: "
+                        + str(type(data["addresses"]))
+                    )
+            else:
+                raise DataValidationError(
+                    "Invalid type for list [addresses]: "
+                    + str(type(data["addresses"]))
+                )     
+
         except AttributeError as error:
             raise DataValidationError("Invalid attribute: " + error.args[0])
         except KeyError as error:
@@ -113,17 +143,19 @@ class Customer(db.Model):
         logger.info("Processing all Customer")
         return cls.query.all()
 
-    @classmethod
-    def find(cls, by_id):
-        """ Finds a Customer by it's ID """
-        logger.info("Processing lookup for id %s ...", by_id)
-        return cls.query.get(by_id)
+ 
 
     @classmethod
+    def find(cls, by_id):
+        """ Finds a Customer by its id """
+
+        logger.info("Processing lookup for id %s ...", by_id)
+        return cls.query.get(by_id)
+    '''
+    # To be implemented
+    @classmethod
     def find_or_404(cls, by_id):
-        """ Find a Customer by it's id """
-        logger.info("Processing lookup or 404 for id %s ...", by_id)
-        return cls.query.get_or_404(by_id)
+        """ Find a Customer by its id """
 
     @classmethod
     def find_by_first_name(cls, first_name):
@@ -132,8 +164,6 @@ class Customer(db.Model):
         Args:
             name (string): the name of the Customer you want to match
         """
-        logger.info("Processing first name query for %s ...", first_name)
-        return cls.query.filter(cls.first_name == first_name)
 
     @classmethod
     def find_by_last_name(cls, last_name):
@@ -142,8 +172,6 @@ class Customer(db.Model):
         Args:
             name (string): the name of the Customer you want to match
         """
-        logger.info("Processing last name query for %s ...", last_name)
-        return cls.query.filter(cls.last_name == last_name)
 
     @classmethod
     def find_by_userid(cls, userid):
@@ -152,5 +180,4 @@ class Customer(db.Model):
         Args:
             name (string): the name of the Customer you want to match
         """
-        logger.info("Processing user id query for %s ...", userid)
-        return cls.query.filter(cls.userid == userid)
+    '''

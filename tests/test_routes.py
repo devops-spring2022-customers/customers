@@ -60,7 +60,126 @@ class TestCustomerServer(TestCase):
     #  P L A C E   T E S T   C A S E S   H E R E
     ######################################################################
 
+    def _create_customers(self, count):
+        """Factory method to create customers in bulk"""
+        customers = []
+        for _ in range(count):
+            test_customer = CustomerFactory()
+            resp = self.app.post(
+                BASE_URL, json=test_customer.serialize(), content_type=CONTENT_TYPE_JSON
+            )
+            self.assertEqual(
+                resp.status_code, status.HTTP_201_CREATED, "Could not create test customer"
+            )
+            new_customer = resp.get_json()
+            test_customer.id = new_customer["id"]
+            customers.append(test_customer)
+        return customers
+
     def test_index(self):
-        """ Test index call """
+        """Test the Home Page"""
         resp = self.app.get("/")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(data["name"], "Customer Demo REST API Service")
+
+    def test_get_customer_not_found(self):
+        """Get a Customer thats not found"""
+        resp = self.app.get("/customers/0")
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+    
+    def test_post_customer_by_id_not_allowed(self):
+        """Post a Customer by id (Not allowed method)"""
+        resp = self.app.post("/customers/0")
+        self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_create_customer(self):
+        """Create a new Customer"""
+        test_customer = CustomerFactory()
+        logging.debug(test_customer)
+        resp = self.app.post(
+            BASE_URL, json=test_customer.serialize(), content_type=CONTENT_TYPE_JSON
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        # Make sure location header is set
+        location = resp.headers.get("Location", None)
+        self.assertIsNotNone(location)
+        # Check the data is correct
+        new_customer = resp.get_json()
+        self.assertEqual(new_customer["first_name"], test_customer.first_name, "First name does not match")
+        self.assertEqual(new_customer["last_name"], test_customer.last_name, "Last name does not match")
+        self.assertEqual(new_customer["userid"], test_customer.userid, "Userid does not match")
+        self.assertEqual(new_customer["password"], test_customer.password, "Password does not match")
+        self.assertEqual(new_customer["addresses"], test_customer.addresses, "Addresses does not match")
+        # Check that the location header was correct
+        resp = self.app.get(location, content_type=CONTENT_TYPE_JSON)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        new_customer = resp.get_json()
+        self.assertEqual(new_customer["first_name"], test_customer.first_name, "First name does not match")
+        self.assertEqual(new_customer["last_name"], test_customer.last_name, "Last name does not match")
+        self.assertEqual(new_customer["userid"], test_customer.userid, "Userid does not match")
+        self.assertEqual(new_customer["password"], test_customer.password, "Password does not match")
+        self.assertEqual(new_customer["addresses"], test_customer.addresses, "Addresses does not match")
+
+    def test_create_customer_no_data(self):
+        """Create a Customer with missing data"""
+        resp = self.app.post(BASE_URL, json={}, content_type=CONTENT_TYPE_JSON)
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_create_customer_no_content_type(self):
+        """Create a Customer with no content type"""
+        resp = self.app.post(BASE_URL)
+        self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+
+    def test_create_customer_bad_first_name(self):
+        """ Create a Customer with bad first name """
+        test_customer = CustomerFactory()
+        logging.debug(test_customer)
+        # change available to a string
+        test_customer.first_name = 123
+        resp = self.app.post(
+            BASE_URL, json=test_customer.serialize(), content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_create_customer_bad_last_name(self):
+        """ Create a Customer with bad last name """
+        test_customer = CustomerFactory()
+        logging.debug(test_customer)
+        # change available to a string
+        test_customer.last_name = True
+        resp = self.app.post(
+            BASE_URL, json=test_customer.serialize(), content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_create_customer_empty_addresses(self):
+        """ Create a Customer with bad last name """
+        test_customer = CustomerFactory()
+        logging.debug(test_customer)
+        # change available to a string
+        test_customer.addresses = []
+        resp = self.app.post(
+            BASE_URL, json=test_customer.serialize(), content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+    
+    def test_create_customer_bad_addresses_type(self):
+        """ Create a Customer with bad last name """
+        test_customer = CustomerFactory()
+        logging.debug(test_customer)
+        # change available to a string
+        test_customer.addresses = ["all", 123]
+        resp = self.app.post(
+            BASE_URL, json=test_customer.serialize(), content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+    
+    def test_create_customer_bad_url(self):
+        """Create a Customer with wrong url"""
+        test_customer = CustomerFactory()
+        logging.debug(test_customer)
+        resp = self.app.post(
+            BASE_URL+"s", json=test_customer.serialize(), content_type=CONTENT_TYPE_JSON
+        )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
