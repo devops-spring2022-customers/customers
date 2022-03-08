@@ -100,7 +100,7 @@ def create_customers():
         jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
     )
 
-'''
+
 ######################################################################
 # UPDATE AN EXISTING CUSTOMER
 ######################################################################
@@ -108,12 +108,19 @@ def create_customers():
 def update_customers(customer_id):
     """
     Update a Customer
-
     This endpoint will update a Customer based the body that is posted
     """
+
+    app.logger.info("Requesting to update a customer")
+    check_content_type("application/json")
+    customer = Customer.find(customer_id)
+    customer.deserialize(request.get_json())
+    customer.customer_id = customer_id
+    customer.update()
+    app.logger.info("Updated customer with id %s", customer.customer_id)
     
-    return None
-'''
+    
+    return customer.serialize(), status.HTTP_200_OK
 
 ######################################################################
 # DELETE A CUSTOMER
@@ -147,18 +154,6 @@ def get_customers_addresses(customer_id):
     
     return None
 
-######################################################################
-# UPDATE A CUSTOMER'S ADDRESSES
-######################################################################
-@app.route("/customers/<int:customer_id>/addresses", methods=["PUT"])
-def update_customers_addresses(customer_id):
-    """
-    Update a Customer's addresses
-
-    This endpoint will update a Customer's addresses based the body that is posted
-    """
-    
-    return None
 '''
 
 ######################################################################
