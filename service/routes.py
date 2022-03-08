@@ -141,6 +141,7 @@ def delete_customers(customer_id):
     return make_response("", status.HTTP_204_NO_CONTENT)
 
 '''
+'''
 ######################################################################
 # RETRIEVE A CUSTOMER'S ADDRESSES
 ######################################################################
@@ -151,10 +152,14 @@ def get_customers_addresses(customer_id):
 
     This endpoint will return a Customer's addresses based on it's id
     """
-    
-    return None
+    app.logger.info("Request for addresses with id: %s", customer_id)
+    customer = Customer.find(customer_id)
+    if not customer:
+        raise NotFound("Customer with id '{}' was not found.".format(customer_id))
 
-'''
+    app.logger.info("Returning addresses of customer: %s, %s with addresses: %s", customer.first_name,customer.last_name, customer.addresses)
+    return make_response(jsonify(customer.serialize()), status.HTTP_200_OK)
+
 
 ######################################################################
 # DELETE A CUSTOMER'S ADDRESS
