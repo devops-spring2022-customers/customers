@@ -189,6 +189,15 @@ class TestCustomerModel(unittest.TestCase):
         data["addresses"] = "abc"
         customer = Customer()
         self.assertRaises(DataValidationError, customer.deserialize, data)
+<<<<<<< HEAD
+    
+    def test_list_all(self):
+        """Test case to list all customers"""
+        customers = CustomerFactory.create_batch(3)
+        for customer in customers:
+            customer.create()
+        self.assertEqual(len(Customer.all()), 3)
+=======
 
     def test_delete_a_customer(self):
         """Delete a Customer"""
@@ -209,3 +218,4 @@ class TestCustomerModel(unittest.TestCase):
         # delete the customer and make sure it isn't in the database
         test_customer.delete_addresses()
         self.assertEqual(test_customer.addresses, [])
+>>>>>>> 36b1a2db4253041a43a21d63ce225353ebadca0d
