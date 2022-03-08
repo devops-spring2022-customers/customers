@@ -183,6 +183,7 @@ class TestCustomerServer(TestCase):
             BASE_URL+"s", json=test_customer.serialize(), content_type=CONTENT_TYPE_JSON
         )
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+<<<<<<< HEAD
     
     def test_get_all(self):
         """Get all customers"""
@@ -191,3 +192,35 @@ class TestCustomerServer(TestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         res_data = res.get_json()
         self.assertEqual(len(res_data),3)
+=======
+
+    def test_delete_customer(self):
+        """Delete a customer"""
+        test_customer = self._create_customers(1)[0]
+        resp = self.app.delete(
+            "{0}/{1}".format(BASE_URL, test_customer.id), content_type=CONTENT_TYPE_JSON
+        )
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(len(resp.data), 0)
+        # make sure they are deleted
+        resp = self.app.get(
+            "{0}/{1}".format(BASE_URL, test_customer.id), content_type=CONTENT_TYPE_JSON
+        )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_delete_customer_addresses(self):
+        """Delete a customer addresses"""
+        # test_customer = self._create_customers(1)[0]
+        test_customer = CustomerFactory()
+        test_customer.addresses = ["2022 New York Street"]
+        resp = self.app.delete(
+            "{0}/{1}/{2}".format(BASE_URL, test_customer.id, "addresses"), content_type=CONTENT_TYPE_JSON
+        )
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(len(resp.data), 0)
+        # make sure they are deleted
+        # resp = self.app.get(
+        #     "{0}/{1}/{2}".format(BASE_URL, test_customer.id, "addresses"), content_type=CONTENT_TYPE_JSON
+        # )
+        # self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+>>>>>>> 36b1a2db4253041a43a21d63ce225353ebadca0d

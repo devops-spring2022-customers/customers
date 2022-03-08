@@ -113,7 +113,7 @@ def update_customers(customer_id):
     """
     
     return None
-
+'''
 
 ######################################################################
 # DELETE A CUSTOMER
@@ -125,9 +125,15 @@ def delete_customers(customer_id):
 
     This endpoint will delete a Customer based the id specified in the path
     """
-    
-    return None
+    app.logger.info("Request to delete customer with id: %s", customer_id)
+    customer = Customer.find(customer_id)
+    if customer:
+        customer.delete()
 
+    app.logger.info("Customer with ID [%s] delete complete.", customer_id)
+    return make_response("", status.HTTP_204_NO_CONTENT)
+
+'''
 ######################################################################
 # RETRIEVE A CUSTOMER'S ADDRESSES
 ######################################################################
@@ -153,6 +159,7 @@ def update_customers_addresses(customer_id):
     """
     
     return None
+'''
 
 ######################################################################
 # DELETE A CUSTOMER'S ADDRESS
@@ -165,9 +172,15 @@ def delete_customers_addresses(customer_id):
     This endpoint will delete a Customer's address based the id and address 
     specified in the path and the body that is posted
     """
-    
-    return None
-'''
+
+    app.logger.info("Request to delete customer address with id: %s", customer_id)
+    customer = Customer.find(customer_id)
+    if customer:
+        customer.delete_addresses()
+
+    app.logger.info("Customer with ID [%s] 's addresses delete complete.", customer_id)
+    return make_response("", status.HTTP_204_NO_CONTENT)
+
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
