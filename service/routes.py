@@ -154,18 +154,6 @@ def get_customers_addresses(customer_id):
     
     return None
 
-######################################################################
-# UPDATE A CUSTOMER'S ADDRESSES
-######################################################################
-@app.route("/customers/<int:customer_id>/addresses", methods=["PUT"])
-def update_customers_addresses(customer_id):
-    """
-    Update a Customer's addresses
-
-    This endpoint will update a Customer's addresses based the body that is posted
-    """
-    
-    return None
 '''
 
 ######################################################################
