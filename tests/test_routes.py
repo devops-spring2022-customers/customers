@@ -209,7 +209,27 @@ class TestCustomerServer(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(len(resp.data), 0)
         # make sure they are deleted
-        # resp = self.app.get(
-        #     "{0}/{1}/{2}".format(BASE_URL, test_customer.id, "addresses"), content_type=CONTENT_TYPE_JSON
-        # )
-        # self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+        resp = self.app.get(
+            "{0}/{1}/{2}".format(BASE_URL, test_customer.id, "addresses"), content_type=CONTENT_TYPE_JSON
+        )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_get_addresses(self):
+        """Get Customer's Address"""
+        # get the id of a customer
+        test_add = self._create_customers(1)[0]
+        test_add.addresses = ["2022 New York Street"]
+        resp = self.app.get(
+            "{0}/{1}/{2}".format(BASE_URL, test_add.id, "addresses"), content_type=CONTENT_TYPE_JSON
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        resp = self.app.post(
+            BASE_URL, json=test_add.serialize(), content_type="application/json"
+        )
+        data = resp.get_json()
+        self.assertEqual(data["addresses"], test_add.addresses)
+
+    def test_get_addresses_not_found(self):
+        """Get Addresses Thats Not Found"""
+        resp = self.app.get("/customers/0/addresses")
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
