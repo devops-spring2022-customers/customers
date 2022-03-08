@@ -189,7 +189,6 @@ class TestCustomerModel(unittest.TestCase):
         data["addresses"] = "abc"
         customer = Customer()
         self.assertRaises(DataValidationError, customer.deserialize, data)
-<<<<<<< HEAD
 
     def test_update_a_customer(self):
         """Update or return 404 NOT FOUND"""
@@ -205,8 +204,7 @@ class TestCustomerModel(unittest.TestCase):
 
         cust = Customer.find(1)
         self.assertEqual(cust.first_name, "Jash T")
-=======
-    
+
     def test_list_all(self):
         """Test case to list all customers"""
         customers = CustomerFactory.create_batch(3)
@@ -233,4 +231,3 @@ class TestCustomerModel(unittest.TestCase):
 
         # delete the customer and make sure it isn't in the database
         test_customer.delete_addresses()
->>>>>>> 868f4508487180cadd94c11d3aa2da541cbd0f70

@@ -183,7 +183,6 @@ class TestCustomerServer(TestCase):
             BASE_URL+"s", json=test_customer.serialize(), content_type=CONTENT_TYPE_JSON
         )
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
-<<<<<<< HEAD
 
     def test_update(self):
         """Update a customer's firstname"""
@@ -203,7 +202,6 @@ class TestCustomerServer(TestCase):
         updated_customer  = resp.get_json()
         self.assertEqual(new_customer["id"],updated_customer["id"])
         self.assertEqual(new_customer["first_name"], updated_customer["first_name"])
-=======
     
     def test_get_all(self):
         """Get all customers"""
@@ -242,4 +240,3 @@ class TestCustomerServer(TestCase):
         #     "{0}/{1}/{2}".format(BASE_URL, test_customer.id, "addresses"), content_type=CONTENT_TYPE_JSON
         # )
         # self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
->>>>>>> 868f4508487180cadd94c11d3aa2da541cbd0f70
