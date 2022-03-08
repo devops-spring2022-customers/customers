@@ -93,7 +93,7 @@ class TestCustomerModel(unittest.TestCase):
         self.assertEqual(len(customers[1].addresses), 1)
 
     def test_serialize_a_customer(self):
-        """Test serialization of a Pet"""
+        """Test serialization of a Customer"""
         customer = CustomerFactory()
         data = customer.serialize()
         self.assertNotEqual(data, None)
@@ -133,7 +133,7 @@ class TestCustomerModel(unittest.TestCase):
         self.assertEqual(customer.addresses[0], "2022 New York Road")
 
     def test_deserialize_missing_data(self):
-        """Test deserialization of a Pet with missing data"""
+        """Test deserialization of a Customer with missing data"""
         data = {
             "id": 1,
             "first_name": "allen",
@@ -189,6 +189,7 @@ class TestCustomerModel(unittest.TestCase):
         data["addresses"] = "abc"
         customer = Customer()
         self.assertRaises(DataValidationError, customer.deserialize, data)
+<<<<<<< HEAD
 
     def test_update_a_customer(self):
         """Update or return 404 NOT FOUND"""
@@ -204,3 +205,32 @@ class TestCustomerModel(unittest.TestCase):
 
         cust = Customer.find(1)
         self.assertEqual(cust.first_name, "Jash T")
+=======
+    
+    def test_list_all(self):
+        """Test case to list all customers"""
+        customers = CustomerFactory.create_batch(3)
+        for customer in customers:
+            customer.create()
+        self.assertEqual(len(Customer.all()), 3)
+        self.assertEqual(len(Customer.all()), 3)
+
+    def test_delete_a_customer(self):
+        """Delete a Customer"""
+        test_customer = CustomerFactory()
+        test_customer.create()
+        self.assertEqual(len(test_customer.all()), 1)
+        # delete the customer and make sure it isn't in the database
+        test_customer.delete()
+        self.assertEqual(len(test_customer.all()), 0)
+
+    def test_delete_customer_address(self):
+        """Delete a Customer address"""
+        test_customer = CustomerFactory()
+        test_customer.create()
+        test_customer.addresses = ["2022 New York Street"]
+        self.assertEqual(len(test_customer.addresses), 1)
+
+        # delete the customer and make sure it isn't in the database
+        test_customer.delete_addresses()
+>>>>>>> 868f4508487180cadd94c11d3aa2da541cbd0f70

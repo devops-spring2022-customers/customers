@@ -183,6 +183,7 @@ class TestCustomerServer(TestCase):
             BASE_URL+"s", json=test_customer.serialize(), content_type=CONTENT_TYPE_JSON
         )
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+<<<<<<< HEAD
 
     def test_update(self):
         """Update a customer's firstname"""
@@ -202,3 +203,43 @@ class TestCustomerServer(TestCase):
         updated_customer  = resp.get_json()
         self.assertEqual(new_customer["id"],updated_customer["id"])
         self.assertEqual(new_customer["first_name"], updated_customer["first_name"])
+=======
+    
+    def test_get_all(self):
+        """Get all customers"""
+        self._create_customers(3)
+        res = self.app.get(BASE_URL)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        res_data = res.get_json()
+        self.assertEqual(len(res_data),3)
+
+    def test_delete_customer(self):
+        """Delete a customer"""
+        test_customer = self._create_customers(1)[0]
+        resp = self.app.delete(
+            "{0}/{1}".format(BASE_URL, test_customer.id), content_type=CONTENT_TYPE_JSON
+        )
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(len(resp.data), 0)
+        # make sure they are deleted
+        resp = self.app.get(
+            "{0}/{1}".format(BASE_URL, test_customer.id), content_type=CONTENT_TYPE_JSON
+        )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_delete_customer_addresses(self):
+        """Delete a customer addresses"""
+        # test_customer = self._create_customers(1)[0]
+        test_customer = CustomerFactory()
+        test_customer.addresses = ["2022 New York Street"]
+        resp = self.app.delete(
+            "{0}/{1}/{2}".format(BASE_URL, test_customer.id, "addresses"), content_type=CONTENT_TYPE_JSON
+        )
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(len(resp.data), 0)
+        # make sure they are deleted
+        # resp = self.app.get(
+        #     "{0}/{1}/{2}".format(BASE_URL, test_customer.id, "addresses"), content_type=CONTENT_TYPE_JSON
+        # )
+        # self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+>>>>>>> 868f4508487180cadd94c11d3aa2da541cbd0f70

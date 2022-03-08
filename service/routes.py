@@ -13,6 +13,7 @@ DELETE /customers/{id} - deletes a Customer record in the database
 import os
 import sys
 import logging
+import json
 from werkzeug.exceptions import NotFound
 from flask import Flask, jsonify, request, url_for, make_response, abort
 from . import status  # HTTP Status Codes
@@ -40,17 +41,25 @@ def index():
         ),
         status.HTTP_200_OK,
     )
-'''
+
 ######################################################################
 # LIST ALL CUSTOMERS
 ######################################################################
 @app.route("/customers", methods=["GET"])
 def list_customers():
     """Returns all of the customer"""
+    app.logger.info('Request to list Customers...')
+    customer = Customer.all()
+    customer_list = [x.serialize() for x in customer]
+    new_dict = {}
+    for item in customer_list:
+        name = item['id']
+        new_dict[name] = item
+    return new_dict, status.HTTP_200_OK
 
-    return None
+    #return None
 
-'''
+
 ######################################################################
 # RETRIEVE A CUSTOMER
 ######################################################################
@@ -112,9 +121,7 @@ def update_customers(customer_id):
     
     
     return customer.serialize(), status.HTTP_200_OK
-    
 
-'''
 ######################################################################
 # DELETE A CUSTOMER
 ######################################################################
@@ -125,9 +132,15 @@ def delete_customers(customer_id):
 
     This endpoint will delete a Customer based the id specified in the path
     """
-    
-    return None
+    app.logger.info("Request to delete customer with id: %s", customer_id)
+    customer = Customer.find(customer_id)
+    if customer:
+        customer.delete()
 
+    app.logger.info("Customer with ID [%s] delete complete.", customer_id)
+    return make_response("", status.HTTP_204_NO_CONTENT)
+
+'''
 ######################################################################
 # RETRIEVE A CUSTOMER'S ADDRESSES
 ######################################################################
@@ -153,6 +166,7 @@ def update_customers_addresses(customer_id):
     """
     
     return None
+'''
 
 ######################################################################
 # DELETE A CUSTOMER'S ADDRESS
@@ -165,9 +179,15 @@ def delete_customers_addresses(customer_id):
     This endpoint will delete a Customer's address based the id and address 
     specified in the path and the body that is posted
     """
-    
-    return None
-'''
+
+    app.logger.info("Request to delete customer address with id: %s", customer_id)
+    customer = Customer.find(customer_id)
+    if customer:
+        customer.delete_addresses()
+
+    app.logger.info("Customer with ID [%s] 's addresses delete complete.", customer_id)
+    return make_response("", status.HTTP_204_NO_CONTENT)
+
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S

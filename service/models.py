@@ -58,11 +58,20 @@ class Customer(db.Model):
         if not self.id:
             raise DataValidationError("Update called with empty ID field")
         db.session.commit()
-
-    '''
+        
     def delete(self):
         """ Removes a Customer from the data store """
-    '''
+        logger.info("Deleting %s, %s", self.first_name, self.last_name)
+        db.session.delete(self)
+        db.session.commit()
+    
+    def delete_addresses(self):
+        """ Removes a Customer address from the data store """
+        logger.info("Deleting %s, %s 's addresses", self.first_name, self.last_name)
+        # db.session.delete(self.addresses)
+        self.addresses = []
+        db.session.commit()
+    
 
     def serialize(self):
         """ Serializes a Customer into a dictionary """
@@ -146,8 +155,6 @@ class Customer(db.Model):
         """ Returns all of the Customer in the database """
         logger.info("Processing all Customer")
         return cls.query.all()
-
- 
 
     @classmethod
     def find(cls, by_id):
