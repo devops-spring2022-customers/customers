@@ -1,51 +1,61 @@
-# project-template
+# Customers Microservice
 
-This is a skeleton you can use to start your projects
+This is a Customer microservice for users and developers.
 
 ## Overview
 
-This project template contains starter code for your class project. The `/service` folder contains your `models.py` file for your model and a `routes.py` file for your service. The `/tests` folder has test case starter code for testing the model and the service separately. All you need to do is add your functionality. You can use the [lab-flask-rest](https://github.com/nyu-devops/lab-flask-rest) for code examples to take from.
+This repository is an implementation of the Customer microservice supporting Create, Read, Update, Delete, and List functions as well as Post, Get, Put, and Delete API calls.
 
-## Automatic Setup
+## Base URL
 
-The best way to use this repo is to start your own repo using it as a git template. To do this just press the green **Use this template** button in GitHub and this will become the source for your repository.
+localhost:8000
 
-## Manual Setup
+## Service Endpoints
 
-You can also clone this repository and then copy and paste the starter code into your project repo folder on your local computer. Be careful not to copy over your own README.md file so be selective in what you copy.
+Methods | Rule |
+--- | --- |
+POST | /customers |
+GET | / |
+GET | /customers |
+GET | /customers/{id} |
+GET | /customers/{id}/addresses |
+PUT | /customers/{id} |
+DELETE | /customers/{id} |
+DELETE | /customers/{id}/addresses |
 
-There are two hidden files that you will need to copy manually if you use the Finder to copy files from this folder into your repo folder. They are:
+## Usage
 
-```bash
-    cp .coveragerc ../<your_repo_folder>/
-    cp .gitignore  ../<your_repo_folder>/
+Open the repository in docker container and run flask in terminal:
+
+```console
+flask run
 ```
 
-## Contents
+Open new terminal and run the following commands for different endpoints: 
 
-The project contains the following:
+To create a customer:
+```console
+curl -X POST localhost:8000/customers -H 'Content-Type: application/json' -d '{"first_name":"myfirstname", "last_name":"mylastname", "userid":"myuserid","password":"my_password","addresses":["myaddress1"]}'
+```
 
-```text
-.coveragerc         - settings file for code coverage options
-.devcontainers      - support for VSCode Remote Containers
-.gitignore          - this will ignore vagrant and other metadata files
-dot-env-example     - copy to .env to use environment variables
-requirements.txt    - list if Python libraries required by your code
-config.py           - configuration parameters
+To retrieve all customers:
+```console
+curl -X GET localhost:8000/customers
+```
 
-service/                - service python package
-├── __init__.py         - package initializer
-├── error_handlers.py   - HTTP error handling code
-├── models.py           - module with business models
-├── routes.py           - module with service routes
-└── status.py           - HTTP status constants
+To retrieve a valid customer by id:
+```console
+curl -X GET localhost:8000/customers/{id}
+```
 
-tests/              - test cases package
-├── __init__.py     - package initializer
-├── test_models.py  - test suite for busines models
-└── test_routes.py  - test suite for service routes
+To update a valid customer by id:
+```console
+curl -X PUT localhost:8000/customers/{id} -H 'Content-Type: application/json' -d '{"first_name":"myfirstnameupdated", "last_name":"mylastnameupdated", "userid":"myuserid","password":"my_password","addresses":["myaddress1","myaddress2"]}'
+```
 
-Vagrantfile         - sample Vagrant file that installs Python 3 and PostgreSQL
+To delete a valid customer by id:
+```console
+curl -X DELETE localhost:8000/customers/{id}
 ```
 
 This repository is part of the NYU class **CSCI-GA.2810-001: DevOps and Agile Methodologies** taught by John Rofrano, Adjunct Instructor, NYU Courant Institute, Graduate Division, Computer Science.
