@@ -184,6 +184,33 @@ class TestCustomerServer(TestCase):
         )
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
+    def test_update(self):
+        """Update a customer's firstname"""
+
+        random_customers = CustomerFactory()
+        resp = self.app.post(
+            BASE_URL, json=random_customers.serialize(), content_type=CONTENT_TYPE_JSON
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        
+        new_customer = resp.get_json()
+        new_customer["first_name"] = "Jash"
+
+        resp = self.app.put("/customers/{}".format(new_customer["id"]), json = new_customer, content_type = CONTENT_TYPE_JSON)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        updated_customer  = resp.get_json()
+        self.assertEqual(new_customer["id"],updated_customer["id"])
+        self.assertEqual(new_customer["first_name"], updated_customer["first_name"])
+    
+    def test_get_all(self):
+        """Get all customers"""
+        self._create_customers(3)
+        res = self.app.get(BASE_URL)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        res_data = res.get_json()
+        self.assertEqual(len(res_data),3)
+
     def test_delete_customer(self):
         """Delete a customer"""
         test_customer = self._create_customers(1)[0]

@@ -13,6 +13,7 @@ DELETE /customers/{id} - deletes a Customer record in the database
 import os
 import sys
 import logging
+import json
 from werkzeug.exceptions import NotFound
 from flask import Flask, jsonify, request, url_for, make_response, abort
 from . import status  # HTTP Status Codes
@@ -40,17 +41,25 @@ def index():
         ),
         status.HTTP_200_OK,
     )
-'''
+
 ######################################################################
 # LIST ALL CUSTOMERS
 ######################################################################
 @app.route("/customers", methods=["GET"])
 def list_customers():
     """Returns all of the customer"""
+    app.logger.info('Request to list Customers...')
+    customer = Customer.all()
+    customer_list = [x.serialize() for x in customer]
+    new_dict = {}
+    for item in customer_list:
+        name = item['id']
+        new_dict[name] = item
+    return new_dict, status.HTTP_200_OK
 
-    return None
+    #return None
 
-'''
+
 ######################################################################
 # RETRIEVE A CUSTOMER
 ######################################################################
@@ -91,7 +100,7 @@ def create_customers():
         jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
     )
 
-'''
+
 ######################################################################
 # UPDATE AN EXISTING CUSTOMER
 ######################################################################
@@ -99,12 +108,19 @@ def create_customers():
 def update_customers(customer_id):
     """
     Update a Customer
-
     This endpoint will update a Customer based the body that is posted
     """
+
+    app.logger.info("Requesting to update a customer")
+    check_content_type("application/json")
+    customer = Customer.find(customer_id)
+    customer.deserialize(request.get_json())
+    customer.customer_id = customer_id
+    customer.update()
+    app.logger.info("Updated customer with id %s", customer.customer_id)
     
-    return None
-'''
+    
+    return customer.serialize(), status.HTTP_200_OK
 
 ######################################################################
 # DELETE A CUSTOMER
@@ -144,20 +160,6 @@ def get_customers_addresses(customer_id):
     app.logger.info("Returning addresses of customer: %s, %s with addresses: %s", customer.first_name,customer.last_name, customer.addresses)
     return make_response(jsonify(customer.serialize()), status.HTTP_200_OK)
 
-'''
-######################################################################
-# UPDATE A CUSTOMER'S ADDRESSES
-######################################################################
-@app.route("/customers/<int:customer_id>/addresses", methods=["PUT"])
-def update_customers_addresses(customer_id):
-    """
-    Update a Customer's addresses
-
-    This endpoint will update a Customer's addresses based the body that is posted
-    """
-    
-    return None
-'''
 
 ######################################################################
 # DELETE A CUSTOMER'S ADDRESS
