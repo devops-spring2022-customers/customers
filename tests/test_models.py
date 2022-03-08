@@ -217,5 +217,4 @@ class TestCustomerModel(unittest.TestCase):
 
         # delete the customer and make sure it isn't in the database
         test_customer.delete_addresses()
-        self.assertEqual(test_customer.addresses, [])
 >>>>>>> 36b1a2db4253041a43a21d63ce225353ebadca0d
