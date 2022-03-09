@@ -17,6 +17,102 @@ class DataValidationError(Exception):
 
     pass
 
+######################################################################
+#  A D D R E S S   M O D E L
+######################################################################
+class Address(db.Model):
+    """
+    Class that represents an Address
+    """
+
+    # Table Schema
+    id = db.Column(db.Integer, primary_key=True)
+    customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'), nullable=False)
+    address = db.Column(db.String(64))
+
+    def __repr__(self):
+        return "<Address %r id=[%s] account[%s]>" % (self.name, self.id, self.customer_id)
+
+    def __str__(self):
+        return "%s " % (self.address)
+    def serialize(self):
+        """ Serializes a Address into a dictionary """
+        return {
+            "id": self.id,
+            "customer_id": self.customer_id,
+            "address": self.address,
+        }
+
+    def deserialize(self, data):
+        """
+        Deserializes a Address from a dictionary
+        Args:
+            data (dict): A dictionary containing the resource data
+        """
+        try:
+            self.address = data["address"]
+        except KeyError as error:
+            raise DataValidationError("Invalid Address: missing " + error.args[0])
+        except TypeError as error:
+            raise DataValidationError(
+                "Invalid Address: body of request contained" "bad or no data"
+            )
+        return self
+    
+    def create(self):
+        """
+        Creates an Address to the database
+        """
+        logger.info("Creating %s", self.address)
+        self.id = None  # id must be none to generate next primary key
+        db.session.add(self)
+        db.session.commit()
+
+    def update(self):
+        """
+        Updates an address to the database
+        """
+        if not self.id:
+            raise DataValidationError("Update called with empty ID field")
+        db.session.commit()
+        
+    def delete(self):
+        """ Removes an Address from the data store """
+        logger.info("Deleting %s", self.address)
+        db.session.delete(self)
+        db.session.commit()
+
+    @classmethod
+    def init_db(cls, app):
+        """ Initializes the database session """
+        logger.info("Initializing database")
+        cls.app = app
+        # This is where we initialize SQLAlchemy from the Flask app
+        db.init_app(app)
+        app.app_context().push()
+        db.create_all()  # make our sqlalchemy tables
+
+    @classmethod
+    def all(cls):
+        """ Returns all of the records in the database """
+        logger.info("Processing all records")
+        return cls.query.all()
+
+    @classmethod
+    def find(cls, by_id):
+        """ Finds a record by it's ID """
+        logger.info("Processing lookup for id %s ...", by_id)
+        return cls.query.get(by_id)
+
+    @classmethod
+    def find_or_404(cls, by_id):
+        """ Find a record by it's id """
+        logger.info("Processing lookup or 404 for id %s ...", by_id)
+        return cls.query.get_or_404(by_id)
+
+######################################################################
+#  C U S T O M E R  M O D E L
+######################################################################
 
 class Customer(db.Model):
     """
@@ -34,7 +130,7 @@ class Customer(db.Model):
     last_name = db.Column(db.String(63), nullable=False)
     userid = db.Column(db.String(63), nullable=True)
     password = db.Column(db.String(63), nullable=True)
-    addresses = db.Column(db.ARRAY(db.String(63)), nullable=False)
+    addresses = db.relationship('Address', backref='customer', lazy=True)  
 
     def __repr__(self):
         return "<Customer %r id=[%s]>" % (self.first_name, self.id)
@@ -47,9 +143,6 @@ class Customer(db.Model):
         self.id = None  # id must be none to generate next primary key
         db.session.add(self)
         db.session.commit()
-
-    
-    # To be implemented
 
     def update(self):
         """
@@ -107,8 +200,10 @@ class Customer(db.Model):
                     + str(type(data["last_name"]))
                 )    
             
-            self.userid = data["userid"]
-            self.password = data["password"]
+            if "userid" in data:
+                self.userid = data["userid"]
+            if "password" in data:
+                self.password = data["password"]
 
             if isinstance(data["addresses"], list):
                 if len(data["addresses"]) > 0:
