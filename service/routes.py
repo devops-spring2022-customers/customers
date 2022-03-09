@@ -48,14 +48,16 @@ def index():
 @app.route("/customers", methods=["GET"])
 def list_customers():
     """Returns all of the customer"""
-    app.logger.info('Request to list Customers...')
-    customer = Customer.all()
-    customer_list = [x.serialize() for x in customer]
-    new_dict = {}
-    for item in customer_list:
-        name = item['id']
-        new_dict[name] = item
-    return new_dict, status.HTTP_200_OK
+    app.logger.info("Request for Csutomer list")
+    customers = []
+    first_name = request.args.get("first_name")
+    if first_name:
+        customers = Customer.find_by_name(first_name)
+    else:
+        customers = Customer.all()
+
+    results = [customer.serialize() for customer in customers]
+    return make_response(jsonify(results), status.HTTP_200_OK)
 
     #return None
 
@@ -135,6 +137,11 @@ def delete_customers(customer_id):
     app.logger.info("Request to delete customer with id: %s", customer_id)
     customer = Customer.find(customer_id)
     if customer:
+        for addr in customer.addresses:
+            address_id = addr.id
+            address = Address.find(address_id)
+            if address:
+                address.delete()
         customer.delete()
 
     app.logger.info("Customer with ID [%s] delete complete.", customer_id)

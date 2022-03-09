@@ -16,11 +16,65 @@ class DataValidationError(Exception):
     """ Used for an data validation errors when deserializing """
 
     pass
+######################################################################
+#  P E R S I S T E N T   B A S E   M O D E L
+######################################################################
+class PersistentBase():
+    """ Base class added persistent methods """
 
+    def create(self):
+        """
+        Creates a Customer to the database
+        """
+        logger.info("Creating %s", self.first_name)
+        self.id = None  # id must be none to generate next primary key
+        db.session.add(self)
+        db.session.commit()
+
+    def update(self):
+        """
+        Updates a Customer to the database
+        """
+        #logger.info("Saving %s", self.first_name)
+        db.session.commit()
+
+    def delete(self):
+        """ Removes a Customer from the data store """
+        #logger.info("Deleting %s", self.first_name)
+        db.session.delete(self)
+        db.session.commit()
+
+    @classmethod
+    def init_db(cls, app):
+        """ Initializes the database session """
+        logger.info("Initializing database")
+        cls.app = app
+        # This is where we initialize SQLAlchemy from the Flask app
+        db.init_app(app)
+        app.app_context().push()
+        db.create_all()  # make our sqlalchemy tables
+
+    @classmethod
+    def all(cls):
+        """ Returns all of the records in the database """
+        logger.info("Processing all records")
+        return cls.query.all()
+
+    @classmethod
+    def find(cls, by_id):
+        """ Finds a record by it's ID """
+        logger.info("Processing lookup for id %s ...", by_id)
+        return cls.query.get(by_id)
+
+    @classmethod
+    def find_or_404(cls, by_id):
+        """ Find a record by it's id """
+        logger.info("Processing lookup or 404 for id %s ...", by_id)
+        return cls.query.get_or_404(by_id)
 ######################################################################
 #  A D D R E S S   M O D E L
 ######################################################################
-class Address(db.Model):
+class Address(db.Model,PersistentBase):
     """
     Class that represents an Address
     """
@@ -51,6 +105,8 @@ class Address(db.Model):
             data (dict): A dictionary containing the resource data
         """
         try:
+            #self.id = data["id"]
+            #self.customer_id = data["customer_id"]
             self.address = data["address"]
         except KeyError as error:
             raise DataValidationError("Invalid Address: missing " + error.args[0])
@@ -59,53 +115,12 @@ class Address(db.Model):
                 "Invalid Address: body of request contained" "bad or no data"
             )
         return self
-    
-    def create(self):
-        """
-        Creates an Address to the database
-        """
-        logger.info("Creating %s", self.address)
-        self.id = None  # id must be none to generate next primary key
-        db.session.add(self)
-        db.session.commit()
-
-    def update(self):
-        """
-        Updates an address to the database
-        """
-        if not self.id:
-            raise DataValidationError("Update called with empty ID field")
-        db.session.commit()
-        
-    def delete(self):
-        """ Removes an Address from the data store """
-        logger.info("Deleting %s", self.address)
-        db.session.delete(self)
-        db.session.commit()
-
-    @classmethod
-    def all(cls):
-        """ Returns all of the records in the database """
-        logger.info("Processing all records")
-        return cls.query.all()
-
-    @classmethod
-    def find(cls, by_id):
-        """ Finds a record by it's ID """
-        logger.info("Processing lookup for id %s ...", by_id)
-        return cls.query.get(by_id)
-
-    @classmethod
-    def find_or_404(cls, by_id):
-        """ Find a record by it's id """
-        logger.info("Processing lookup or 404 for id %s ...", by_id)
-        return cls.query.get_or_404(by_id)
 
 ######################################################################
 #  C U S T O M E R  M O D E L
 ######################################################################
 
-class Customer(db.Model):
+class Customer(db.Model, PersistentBase):
     """
     Class that represents a <your resource model name>
     """
@@ -126,39 +141,21 @@ class Customer(db.Model):
     def __repr__(self):
         return "<Customer %r id=[%s]>" % (self.first_name, self.id)
 
-    def create(self):
-        """
-        Creates a Customer to the database
-        """
-        logger.info("Creating %s", self.first_name)
-        self.id = None  # id must be none to generate next primary key
-        db.session.add(self)
-        db.session.commit()
-
-    def update(self):
-        """
-        Updates a Customer to the database
-        """
-        if not self.id:
-            raise DataValidationError("Update called with empty ID field")
-        db.session.commit()
-        
-    def delete(self):
-        """ Removes a Customer from the data store """
-        logger.info("Deleting %s, %s", self.first_name, self.last_name)
-        db.session.delete(self)
-        db.session.commit()    
-
     def serialize(self):
         """ Serializes a Customer into a dictionary """
-        return {
+        customer = {
             "id": self.id, 
             "first_name": self.first_name,
             "last_name": self.last_name,
             "userid": self.userid,
             "password": self.password,
-            "addresses": self.addresses,
+            "addresses": []
         }
+        for address in self.addresses:
+            customer["addresses"].append(address.serialize())
+        
+            
+        return customer
 
     def deserialize(self, data):
         """
@@ -186,15 +183,13 @@ class Customer(db.Model):
             if "userid" in data:
                 self.userid = data["userid"]
             if "password" in data:
-                self.password = data["password"]
+                self.password = data["password"]  
 
-            if isinstance(data["addresses"], list):
-                self.addresses = data["addresses"]
-            else:
-                raise DataValidationError(
-                    "Invalid type for list [addresses]: "
-                    + str(type(data["addresses"]))
-                )     
+            address_list = data.get("addresses")
+            for json_address in address_list:
+                address = Address()
+                address.deserialize(json_address)
+                self.addresses.append(address) 
 
         except AttributeError as error:
             raise DataValidationError("Invalid attribute: " + error.args[0])
@@ -205,36 +200,6 @@ class Customer(db.Model):
                 "Invalid Customer: body of request contained bad or no data " + str(error)
             )
         return self
-
-    @classmethod
-    def init_db(cls, app):
-        """ Initializes the database session """
-        logger.info("Initializing database")
-        cls.app = app
-        # This is where we initialize SQLAlchemy from the Flask app
-        db.init_app(app)
-        app.app_context().push()
-        db.create_all()  # make our sqlalchemy tables
-
-    @classmethod
-    def all(cls):
-        """ Returns all of the Customer in the database """
-        logger.info("Processing all Customer")
-        return cls.query.all()
-
-    @classmethod
-    def find(cls, by_id):
-        """ Finds a Customer by its id """
-        logger.info("Processing lookup for id %s ...", by_id)
-        return cls.query.get(by_id)
-
-
-  
-    @classmethod
-    def find_or_404(cls, by_id):
-        """ Find a Customer by its id """
-        logger.info("Processing lookup or 404 for id %s ...", by_id)
-        return cls.query.get_or_404(by_id)
     
     @classmethod
     def find_by_first_name(cls, first_name):

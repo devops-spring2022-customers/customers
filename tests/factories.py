@@ -42,4 +42,4 @@ class AddressFactory(factory.Factory):
         model = Address
 
     id = factory.Sequence(lambda n: n)
-    address = FuzzyChoice(choices=["2022 New York", "2022 Jersey"])
+    address = "2022 New York"
