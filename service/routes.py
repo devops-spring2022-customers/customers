@@ -140,12 +140,22 @@ def delete_customers(customer_id):
     app.logger.info("Customer with ID [%s] delete complete.", customer_id)
     return make_response("", status.HTTP_204_NO_CONTENT)
 
+######################################################################
+# LIST ADDRESSES
+######################################################################
+@app.route("/customers/<int:customer_id>/addresses", methods=["GET"])
+def list_addresses(customer_id):
+    """ Returns all of the Addresses for a customer """
+    app.logger.info("Request for Customer Addresses...")
+    customer = Customer.find_or_404(customer_id)
+    results = [address.serialize() for address in customer.addresses]
+    return make_response(jsonify(results), status.HTTP_200_OK)
 
 ######################################################################
 # ADD AN ADDRESS TO CUSTOMER
 ######################################################################
 @app.route("/customers/<int:customer_id>/addresses", methods=["POST"])
-def get_customers_addresses(customer_id):
+def post_customers_addresses(customer_id):
     """
     Create an Address on a Customer
     This endpoint will add an address to a customer
@@ -178,7 +188,7 @@ def get_customers_addresses(customer_id, address_id):
 # UPDATE AN ADDRESS
 ######################################################################
 @app.route("/customers/<int:customer_id>/addresses/<int:address_id>", methods=["PUT"])
-def update_addresses(customer_id, address_id):
+def update_customers_addresses(customer_id, address_id):
     """
     Update an Address
     This endpoint will update an Address based the body that is posted
@@ -188,14 +198,14 @@ def update_addresses(customer_id, address_id):
     address = Address.find_or_404(address_id)
     address.deserialize(request.get_json())
     address.id = address_id
-    address.save()
+    address.update()
     return make_response(jsonify(address.serialize()), status.HTTP_200_OK)
 
 ######################################################################
 # DELETE AN ADDRESS
 ######################################################################
 @app.route("/customers/<int:customer_id>/addresses/<int:address_id>", methods=["DELETE"])
-def delete_addresses(customer_id, address_id):
+def delete_customers_addresses(customer_id, address_id):
     """
     Delete an Address
     This endpoint will delete an Address based the id specified in the path

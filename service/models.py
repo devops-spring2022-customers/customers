@@ -35,6 +35,7 @@ class Address(db.Model):
 
     def __str__(self):
         return "%s " % (self.address)
+        
     def serialize(self):
         """ Serializes a Address into a dictionary """
         return {
@@ -81,16 +82,6 @@ class Address(db.Model):
         logger.info("Deleting %s", self.address)
         db.session.delete(self)
         db.session.commit()
-
-    @classmethod
-    def init_db(cls, app):
-        """ Initializes the database session """
-        logger.info("Initializing database")
-        cls.app = app
-        # This is where we initialize SQLAlchemy from the Flask app
-        db.init_app(app)
-        app.app_context().push()
-        db.create_all()  # make our sqlalchemy tables
 
     @classmethod
     def all(cls):
