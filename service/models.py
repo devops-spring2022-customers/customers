@@ -31,7 +31,7 @@ class Address(db.Model):
     address = db.Column(db.String(64))
 
     def __repr__(self):
-        return "<Address %r id=[%s] account[%s]>" % (self.name, self.id, self.customer_id)
+        return "<Address %r id=[%s] customer[%s]>" % (self.name, self.id, self.customer_id)
 
     def __str__(self):
         return "%s " % (self.address)

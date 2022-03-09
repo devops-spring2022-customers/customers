@@ -210,7 +210,7 @@ def delete_customers_addresses(customer_id, address_id):
     Delete an Address
     This endpoint will delete an Address based the id specified in the path
     """
-    app.logger.info("Request to delete account with id: %s", customer_id)
+    app.logger.info("Request to delete customer with id: %s", customer_id)
     address = Address.find(address_id)
     if address:
         address.delete()
