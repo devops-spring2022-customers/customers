@@ -21,7 +21,7 @@ from . import status  # HTTP Status Codes
 # For this example we'll use SQLAlchemy, a popular ORM that supports a
 # variety of backends including SQLite, MySQL, and PostgreSQL
 from flask_sqlalchemy import SQLAlchemy
-from service.models import Customer, DataValidationError
+from service.models import Address, Customer, DataValidationError
 
 # Import Flask application
 from . import app
@@ -140,47 +140,71 @@ def delete_customers(customer_id):
     app.logger.info("Customer with ID [%s] delete complete.", customer_id)
     return make_response("", status.HTTP_204_NO_CONTENT)
 
-'''
-'''
+
+######################################################################
+# ADD AN ADDRESS TO CUSTOMER
+######################################################################
+@app.route("/customers/<int:customer_id>/addresses", methods=["POST"])
+def get_customers_addresses(customer_id):
+    """
+    Create an Address on a Customer
+    This endpoint will add an address to a customer
+    """
+    app.logger.info("Request to add an address to a customer")
+    check_content_type("application/json")
+    customer = Customer.find_or_404(customer_id)
+    address = Address()
+    address.deserialize(request.get_json())
+    customer.addresses.append(address)
+    customer.update()
+    message = address.serialize()
+    return make_response(jsonify(message), status.HTTP_201_CREATED)
+
 ######################################################################
 # RETRIEVE A CUSTOMER'S ADDRESSES
 ######################################################################
-@app.route("/customers/<int:customer_id>/addresses", methods=["GET"])
-def get_customers_addresses(customer_id):
+@app.route("/customers/<int:customer_id>/addresses/<int:address_id>", methods=["GET"])
+def get_customers_addresses(customer_id, address_id):
     """
     Retrieve a single customer's addresses
 
     This endpoint will return a Customer's addresses based on it's id
     """
-    app.logger.info("Request for addresses with id: %s", customer_id)
-    customer = Customer.find(customer_id)
-    if not customer:
-        raise NotFound("Customer with id '{}' was not found.".format(customer_id))
-
-    app.logger.info("Returning addresses of customer: %s, %s with addresses: %s", customer.first_name,customer.last_name, customer.addresses)
-    return make_response(jsonify(customer.serialize()), status.HTTP_200_OK)
-
+    app.logger.info("Request to get an address with id: %s", address_id)
+    address = Address.find_or_404(address_id)
+    return make_response(jsonify(address.serialize()), status.HTTP_200_OK)
 
 ######################################################################
-# DELETE A CUSTOMER'S ADDRESS
+# UPDATE AN ADDRESS
 ######################################################################
-@app.route("/customers/<int:customer_id>/addresses", methods=["DELETE"])
-def delete_customers_addresses(customer_id):
+@app.route("/customers/<int:customer_id>/addresses/<int:address_id>", methods=["PUT"])
+def update_addresses(customer_id, address_id):
     """
-    DELETE a Customer's address
-
-    This endpoint will delete a Customer's address based the id and address 
-    specified in the path and the body that is posted
+    Update an Address
+    This endpoint will update an Address based the body that is posted
     """
+    app.logger.info("Request to update address with id: %s", address_id)
+    check_content_type("application/json")
+    address = Address.find_or_404(address_id)
+    address.deserialize(request.get_json())
+    address.id = address_id
+    address.save()
+    return make_response(jsonify(address.serialize()), status.HTTP_200_OK)
 
-    app.logger.info("Request to delete customer address with id: %s", customer_id)
-    customer = Customer.find(customer_id)
-    if customer:
-        customer.delete_addresses()
-
-    app.logger.info("Customer with ID [%s] 's addresses delete complete.", customer_id)
+######################################################################
+# DELETE AN ADDRESS
+######################################################################
+@app.route("/customers/<int:customer_id>/addresses/<int:address_id>", methods=["DELETE"])
+def delete_addresses(customer_id, address_id):
+    """
+    Delete an Address
+    This endpoint will delete an Address based the id specified in the path
+    """
+    app.logger.info("Request to delete account with id: %s", customer_id)
+    address = Address.find(address_id)
+    if address:
+        address.delete()
     return make_response("", status.HTTP_204_NO_CONTENT)
-
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S

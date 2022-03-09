@@ -156,15 +156,7 @@ class Customer(db.Model):
         """ Removes a Customer from the data store """
         logger.info("Deleting %s, %s", self.first_name, self.last_name)
         db.session.delete(self)
-        db.session.commit()
-    
-    def delete_addresses(self):
-        """ Removes a Customer address from the data store """
-        logger.info("Deleting %s, %s 's addresses", self.first_name, self.last_name)
-        # db.session.delete(self.addresses)
-        self.addresses = []
-        db.session.commit()
-    
+        db.session.commit()    
 
     def serialize(self):
         """ Serializes a Customer into a dictionary """
@@ -206,19 +198,7 @@ class Customer(db.Model):
                 self.password = data["password"]
 
             if isinstance(data["addresses"], list):
-                if len(data["addresses"]) > 0:
-                    for addr in data["addresses"]:
-                        if not isinstance(addr, str):
-                            raise DataValidationError(
-                                "Invalid type for address for string [addresses]: "
-                                + str(type(data["addresses"]))
-                            )
-                    self.addresses = data["addresses"]
-                else:
-                    raise DataValidationError(
-                        "Invalid number of addresses for list [addresses]: "
-                        + str(type(data["addresses"]))
-                    )
+                self.addresses = data["addresses"]
             else:
                 raise DataValidationError(
                     "Invalid type for list [addresses]: "
@@ -254,7 +234,6 @@ class Customer(db.Model):
     @classmethod
     def find(cls, by_id):
         """ Finds a Customer by its id """
-
         logger.info("Processing lookup for id %s ...", by_id)
         return cls.query.get(by_id)
 
@@ -263,33 +242,17 @@ class Customer(db.Model):
     @classmethod
     def find_or_404(cls, by_id):
         """ Find a Customer by its id """
-
-        cls.logger.info("Processing lookup for id %s ...", by_id)
-        return cls.query.get(by_id)
-
-
-    '''
+        logger.info("Processing lookup or 404 for id %s ...", by_id)
+        return cls.query.get_or_404(by_id)
+    
     @classmethod
     def find_by_first_name(cls, first_name):
-        """Returns all Customer with the given first name
-
-        Args:
-            name (string): the name of the Customer you want to match
-        """
+        """ Returns all Customer with the given first name """
+        logger.info("Processing lookup for first_name %s ...", first_name)
+        return cls.query.filter(cls.first_name == first_name)
 
     @classmethod
     def find_by_last_name(cls, last_name):
-        """Returns all Customer with the given last name
-
-        Args:
-            name (string): the name of the Customer you want to match
-        """
-
-    @classmethod
-    def find_by_userid(cls, userid):
-        """Returns all Customer with the given userid
-
-        Args:
-            name (string): the name of the Customer you want to match
-        """
-    '''
+        """ Returns all Customer with the given last name """
+        logger.info("Processing lookup for last_name %s ...", last_name)
+        return cls.query.filter(cls.last_name == last_name)

@@ -2,6 +2,7 @@
 Test cases for Customer Model
 
 """
+from ast import Add
 import logging
 import unittest
 import os
@@ -63,169 +64,291 @@ class TestCustomerModel(unittest.TestCase):
         self.assertEqual(customer.userid, "devops2022")
         self.assertEqual(customer.password, "customers2022")
     
-    # def test_add_a_customer(self):
-    #     """Create a customer and add it to the database"""
+    def test_add_a_customer(self):
+        """Create a customer and add it to the database"""
 
-    #     customers = Customer.all()
-    #     self.assertEqual(customers, [])
-    #     customer = Customer(first_name="allen", last_name="zhang",
-    #                         userid="allenzhang", password="devops2022", addresses=["2022 New York Street", "2022 Jersey Street"])
-    #     self.assertTrue(customer != None)
-    #     self.assertEqual(customer.id, None)
-    #     customer.create()
-    #     # Assert that it was assigned an id and shows up in the database
-    #     self.assertEqual(customer.id, 1)
-    #     customers = Customer.all()
-    #     self.assertEqual(len(customers), 1)
-    #     # Check for an additional customer
-    #     customer = Customer(first_name="allen", last_name="zhang",
-    #                         userid="allenzhang", password="devops2022", addresses=["2022 New York Street"])
-    #     self.assertTrue(customer != None)
-    #     self.assertEqual(customer.id, None)
-    #     customer.create()
-    #     # Assert that it was assigned an id and shows up in the database
-    #     self.assertEqual(customer.id, 2)
-    #     customers = Customer.all()
-    #     self.assertEqual(len(customers), 2)
-    #     self.assertEqual(customers[0].addresses[1], "2022 Jersey Street")
-    #     self.assertEqual(len(customers[1].addresses), 1)
+        customers = Customer.all()
+        self.assertEqual(customers, [])
+        customer = Customer(first_name="allen", last_name="zhang",
+                            userid="allenzhang", password="devops2022", addresses=[])
+        self.assertTrue(customer != None)
+        self.assertEqual(customer.id, None)
+        customer.create()
+        # Assert that it was assigned an id and shows up in the database
+        self.assertEqual(customer.id, 1)
+        customers = Customer.all()
+        self.assertEqual(len(customers), 1)
+        # Check for an additional customer
+        customer = Customer(first_name="allen", last_name="zhang",
+                            userid="allenzhang", password="devops2022", addresses=[])
+        self.assertTrue(customer != None)
+        self.assertEqual(customer.id, None)
+        customer.create()
+        # Assert that it was assigned an id and shows up in the database
+        self.assertEqual(customer.id, 2)
+        customers = Customer.all()
+        self.assertEqual(len(customers), 2)
 
-    # def test_serialize_a_customer(self):
-    #     """Test serialization of a Customer"""
-    #     customer = CustomerFactory()
-    #     data = customer.serialize()
-    #     self.assertNotEqual(data, None)
-    #     self.assertIn("id", data)
-    #     self.assertEqual(data["id"], customer.id)
-    #     self.assertIn("first_name", data)
-    #     self.assertEqual(data["first_name"], customer.first_name)
-    #     self.assertIn("last_name", data)
-    #     self.assertEqual(data["last_name"], customer.last_name)
-    #     self.assertIn("userid", data)
-    #     self.assertEqual(data["userid"], customer.userid)
-    #     self.assertIn("password", data)
-    #     self.assertEqual(data["password"], customer.password)
-    #     self.assertIn("addresses", data)
-    #     self.assertEqual(data["addresses"], customer.addresses)
+    def test_serialize_a_customer(self):
+        """Test serialization of a Customer"""
+        customer = CustomerFactory()
+        address = AddressFactory()
+        customer.addresses = [address]
+        data = customer.serialize()
+        # Customer assertions
+        self.assertNotEqual(data, None)
+        self.assertIn("id", data)
+        self.assertEqual(data["id"], customer.id)
+        self.assertIn("first_name", data)
+        self.assertEqual(data["first_name"], customer.first_name)
+        self.assertIn("last_name", data)
+        self.assertEqual(data["last_name"], customer.last_name)
+        self.assertIn("userid", data)
+        self.assertEqual(data["userid"], customer.userid)
+        self.assertIn("password", data)
+        self.assertEqual(data["password"], customer.password)
+
+        # Address assertions
+        addresses = data["addresses"]
+
+        self.assertIn("addresses", data)
+        self.assertEqual(addresses[0].id, address.id)
+        self.assertEqual(addresses[0].customer_id, address.customer_id)
+        self.assertEqual(addresses[0].address, address.address)
     
-    # def test_deserialize_a_customer(self):
-    #     """Test deserialization of a Customer"""
-    #     data = {
-    #         "id": 1,
-    #         "first_name": "allen",
-    #         "last_name": "zhang",
-    #         "userid": "allenzhang",
-    #         "password": "devops2022",
-    #         "addresses": ["2022 New York Road"],
-    #     }
-    #     customer = Customer()
-    #     customer.deserialize(data)
-    #     self.assertNotEqual(customer, None)
-    #     self.assertEqual(customer.id, None)
-    #     self.assertEqual(customer.first_name, "allen")
-    #     self.assertEqual(customer.last_name, "zhang")
-    #     self.assertEqual(customer.userid, "allenzhang")
-    #     self.assertEqual(customer.password, "devops2022")
-    #     self.assertEqual(customer.addresses, ["2022 New York Road"])
-    #     self.assertEqual(len(customer.addresses), 1)
-    #     self.assertEqual(customer.addresses[0], "2022 New York Road")
+    def test_deserialize_a_customer(self):
+        """Test deserialization of a Customer"""
+        customer = CustomerFactory()
+        address = AddressFactory()
+        customer.addresses = [address]
+        serial_customer = customer.serialize()
+        new_customer = Customer()
+        new_customer.deserialize(serial_customer)
 
-    # def test_deserialize_missing_data(self):
-    #     """Test deserialization of a Customer with missing data"""
-    #     data = {
-    #         "id": 1,
-    #         "first_name": "allen",
-    #         "userid": "allenzhang",
-    #         "password": "devops2022",
-    #         "addresses": ["2022 New York Road"],
-    #     } # Missing last name
-    #     customer = Customer()
-    #     self.assertRaises(DataValidationError, customer.deserialize, data)
+        # Assertions for testing
+        self.assertNotEqual(new_customer, None)
+        self.assertEqual(new_customer.id, None)
+        self.assertEqual(new_customer.first_name, customer.first_name)
+        self.assertEqual(new_customer.last_name, customer.last_name)
+        self.assertEqual(new_customer.userid, customer.userid)
+        self.assertEqual(new_customer.password, customer.password)
+        self.assertEqual(new_customer.addresses[0].address, address.address)
+        self.assertEqual(len(new_customer.addresses), 1)
+        self.assertEqual(new_customer.addresses[0].id, address.id)
+        self.assertEqual(new_customer.addresses[0].customer_id, address.customer_id)
 
-    # def test_deserialize_bad_data(self):
-    #     """Test deserialization of bad data"""
-    #     data = "this is not a dictionary"
-    #     customer = Customer()
-    #     self.assertRaises(DataValidationError, customer.deserialize, data)
+    def test_deserialize_missing_data(self):
+        """Test deserialization of a Customer with missing data"""
+        data = {
+            "id": 1,
+            "first_name": "allen",
+            "userid": "allenzhang",
+            "password": "devops2022",
+            "addresses": [],
+        } # Missing last name
+        customer = Customer()
+        self.assertRaises(DataValidationError, customer.deserialize, data)
+
+    def test_deserialize_bad_data(self):
+        """Test deserialization of bad data"""
+        data = "this is not a dictionary"
+        customer = Customer()
+        self.assertRaises(DataValidationError, customer.deserialize, data)
     
-    # def test_deserialize_bad_first_name(self):
-    #     """ Test deserialization of bad first name attribute """
-    #     test_customer = CustomerFactory()
-    #     data = test_customer.serialize()
-    #     data["first_name"] = 123
-    #     customer = Customer()
-    #     self.assertRaises(DataValidationError, customer.deserialize, data)
+    def test_deserialize_bad_first_name(self):
+        """ Test deserialization of bad first name attribute """
+        test_customer = CustomerFactory()
+        data = test_customer.serialize()
+        data["first_name"] = 123
+        customer = Customer()
+        self.assertRaises(DataValidationError, customer.deserialize, data)
     
-    # def test_deserialize_bad_last_name(self):
-    #     """ Test deserialization of bad last name attribute """
-    #     test_customer = CustomerFactory()
-    #     data = test_customer.serialize()
-    #     data["last_name"] = True
-    #     customer = Customer()
-    #     self.assertRaises(DataValidationError, customer.deserialize, data)
+    def test_deserialize_bad_last_name(self):
+        """ Test deserialization of bad last name attribute """
+        test_customer = CustomerFactory()
+        data = test_customer.serialize()
+        data["last_name"] = True
+        customer = Customer()
+        self.assertRaises(DataValidationError, customer.deserialize, data)
 
-    # def test_deserialize_bad_addresses__list_type(self):
-    #     """ Test deserialization of bad addresses list type attribute """
-    #     test_customer = CustomerFactory()
-    #     data = test_customer.serialize()
-    #     data["addresses"] = [True, 123]
-    #     customer = Customer()
-    #     self.assertRaises(DataValidationError, customer.deserialize, data)
+    def test_deserialize_bad_addresses_list_type(self):
+        """ Test deserialization of bad addresses list type attribute """
+        test_customer = CustomerFactory()
+        data = test_customer.serialize()
+        data["addresses"] = [True, 123]
+        customer = Customer()
+        self.assertRaises(DataValidationError, customer.deserialize, data)
     
-    # def test_deserialize_bad_addresses_length(self):
-    #     """ Test deserialization of bad addresses length """
-    #     test_customer = CustomerFactory()
-    #     data = test_customer.serialize()
-    #     data["addresses"] = []
-    #     customer = Customer()
-    #     self.assertRaises(DataValidationError, customer.deserialize, data)
+    def test_deserialize_bad_addresses_type(self):
+        """ Test deserialization of bad addresses type attribute """
+        test_customer = CustomerFactory()
+        data = test_customer.serialize()
+        data["addresses"] = "abc"
+        customer = Customer()
+        self.assertRaises(DataValidationError, customer.deserialize, data)
+
+    def test_deserialize_with_key_error(self):
+        """ Deserialize an customer with a KeyError """
+        customer = CustomerFactory()
+        self.assertRaises(DataValidationError, customer.deserialize, {})
     
-    # def test_deserialize_bad_addresses_type(self):
-    #     """ Test deserialization of bad addresses type attribute """
-    #     test_customer = CustomerFactory()
-    #     data = test_customer.serialize()
-    #     data["addresses"] = "abc"
-    #     customer = Customer()
-    #     self.assertRaises(DataValidationError, customer.deserialize, data)
+    def test_deserialize_with_type_error(self):
+        """ Deserialize an customer with a TypeError """
+        customer = Customer()
+        self.assertRaises(DataValidationError, customer.deserialize, [])
+    
+    def test_deserialize_address_key_error(self):
+        """ Deserialize an address with a KeyError """
+        address = AddressFactory()
+        self.assertRaises(DataValidationError, address.deserialize, {})
+    
+    def test_deserialize_address_type_error(self):
+        """ Deserialize an address with a TypeError """
+        address = AddressFactory()
+        self.assertRaises(DataValidationError, address.deserialize, [])
 
-    # def test_update_a_customer(self):
-    #     """Update or return 404 NOT FOUND"""
+    def test_update_a_customer(self):
+        """Update or return 404 NOT FOUND"""
+        test_customer = Customer(first_name="Jash", last_name="Doshi",
+                            userid="jashdoshi07", password="devops2022", addresses=[])
+        test_customer.create()
+        self.assertEqual(test_customer.id, 1)
+        test_customer.first_name = "Jash T"
+        test_customer.update()
+        cust = Customer.find(1)
+        self.assertEqual(cust.first_name, "Jash T")
 
-    #     test_customer = Customer(first_name="Jash", last_name="Doshi",
-    #                         userid="jashdoshi07", password="devops2022", addresses=["2022 New York Street", "2022 Jersey Street"])
-    #     test_customer.create()
+    def test_list_all(self):
+        """Test case to list all customers"""
+        customers = CustomerFactory.create_batch(3)
+        for customer in customers:
+            customer.create()
+        self.assertEqual(len(Customer.all()), 3)
+        self.assertEqual(len(Customer.all()), 3)
 
-    #     self.assertEqual(test_customer.id, 1)
+    def test_find(self):
+        """ Find or throw 404 error """
+        customer = CustomerFactory()
+        customer.create()
+        # Assert that it was assigned an id and shows up in the database
+        self.assertEqual(customer.id, 1)
 
-    #     test_customer.first_name = "Jash T"
-    #     test_customer.update()
+        # Fetch it back
+        customer = Customer.find(customer.id)
+        self.assertEqual(customer.id, 1)
 
-    #     cust = Customer.find(1)
-    #     self.assertEqual(cust.first_name, "Jash T")
+    def test_find_or_404(self):
+        """ Find or throw 404 error """
+        customer = CustomerFactory()
+        customer.create()
+        # Assert that it was assigned an id and shows up in the database
+        self.assertEqual(customer.id, 1)
 
-    # def test_list_all(self):
-    #     """Test case to list all customers"""
-    #     customers = CustomerFactory.create_batch(3)
-    #     for customer in customers:
-    #         customer.create()
-    #     self.assertEqual(len(Customer.all()), 3)
-    #     self.assertEqual(len(Customer.all()), 3)
+        # Fetch it back
+        customer = Customer.find_or_404(customer.id)
+        self.assertEqual(customer.id, 1)
+    
+    def test_find_by_first_name(self):
+        """ Find by first_name """
+        customer = CustomerFactory()
+        customer.create()
 
-    # def test_delete_a_customer(self):
-    #     """Delete a Customer"""
-    #     test_customer = CustomerFactory()
-    #     test_customer.create()
-    #     self.assertEqual(len(test_customer.all()), 1)
-    #     # delete the customer and make sure it isn't in the database
-    #     test_customer.delete()
-    #     self.assertEqual(len(test_customer.all()), 0)
+        # Fetch it back by name
+        same_customer = Customer.find_by_first_name(customer.first_name)[0]
+        self.assertEqual(same_customer.id, customer.id)
+        self.assertEqual(same_customer.first_name, customer.first_name)
 
-    # def test_delete_customer_address(self):
-    #     """Delete a Customer address"""
-    #     test_customer = CustomerFactory()
-    #     test_customer.create()
-    #     test_customer.addresses = ["2022 New York Street"]
-    #     self.assertEqual(len(test_customer.addresses), 1)
+    def test_find_by_last_name(self):
+        """ Find by last_name """
+        customer = CustomerFactory()
+        customer.create()
 
-    #     # delete the customer and make sure it isn't in the database
-    #     test_customer.delete_addresses()
+        # Fetch it back by name
+        same_customer = Customer.find_by_last_name(customer.last_name)[0]
+        self.assertEqual(same_customer.id, customer.id)
+        self.assertEqual(same_customer.last_name, customer.last_name)
+
+    def test_delete_a_customer(self):
+        """Delete a Customer"""
+        test_customer = CustomerFactory()
+        test_customer.create()
+        self.assertEqual(len(test_customer.all()), 1)
+        # delete the customer and make sure it isn't in the database
+        test_customer.delete()
+        self.assertEqual(len(test_customer.all()), 0)
+
+    def test_add_customer_address(self):
+        """ Create a customer with an address and add it to the database """
+        customers = Customer.all()
+        self.assertEqual(customers, [])
+        customer = CustomerFactory()
+        address = AddressFactory()
+        customer.addresses.append(address)
+        customer.create()
+        # Assert that it was assigned an id and shows up in the database
+        self.assertEqual(customer.id, 1)
+        customers = Customer.all()
+        self.assertEqual(len(customers), 1)
+
+        new_customer = Customer.find(customer.id)
+        self.assertEqual(new_customer.addresses[0].address, address.address)
+
+        address2 = AddressFactory()
+        customer.addresses.append(address2)
+        customer.update()
+
+        new_customer = Customer.find(customer.id)
+        self.assertEqual(len(new_customer.addresses), 2)
+        self.assertEqual(new_customer.addresses[1].address, address2.address)
+
+    def test_update_customer_address(self):
+        """ Update a customers address """
+        customers = Customer.all()
+        self.assertEqual(customers, [])
+
+        address = AddressFactory()
+        customer = CustomerFactory()
+        customer.addresses.append(address)
+        customer.create()
+        # Assert that it was assigned an id and shows up in the database
+        self.assertEqual(customer.id, 1)
+        customers = Customer.all()
+        self.assertEqual(len(customers), 1)
+
+        # Fetch it back
+        customer = Customer.find(customer.id)
+        old_address = customer.addresses[0]
+        self.assertEqual(old_address.address, address.address)
+
+        old_address.address = "XX"
+        customer.update()
+
+        # Fetch it back again
+        customer = Customer.find(customer.id)
+        address = customer.addresses[0]
+        self.assertEqual(address.address, "XX")
+
+    def test_delete_customer_address(self):
+        """ Delete an customers address """
+        customers = Customer.all()
+        self.assertEqual(customers, [])
+
+        address = AddressFactory()
+        customer = CustomerFactory()
+        customer.addresses.append(address)
+        customer.create()
+
+        # Assert that it was assigned an id and shows up in the database
+        self.assertEqual(customer.id, 1)
+        customers = Customer.all()
+        self.assertEqual(len(customers), 1)
+
+        # Fetch it back
+        customer = Customer.find(customer.id)
+        old_address = customer.addresses[0]
+        address.delete()
+        customer.update()
+
+        # Fetch it back again
+        customer = Customer.find(customer.id)
+        self.assertEqual(len(customer.addresses), 0)
