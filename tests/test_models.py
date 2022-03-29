@@ -51,22 +51,16 @@ class TestCustomerModel(unittest.TestCase):
         """ Creates an customer from a Factory """
         fake_customer = CustomerFactory()
         fake_customer.addresses=addresses
-        # customer = Customer(
-        #     first_name=fake_customer.first_name, 
-        #     last_name=fake_customer.last_name, 
-        #     userid=fake_customer.userid, 
-        #     password=fake_customer.password,
-        #     addresses=addresses
-        # )
-        # self.assertTrue(customer != None)
-        # self.assertEqual(customer.id, None)
         return fake_customer
 
     def _create_address(self):
         """ Creates fake addresses from factory """
         fake_address = AddressFactory()
         address = Address(
-            address=fake_address.address
+            street=fake_address.street,
+            city=fake_address.city,
+            state=fake_address.state,
+            postal_code=fake_address.postal_code
         )
         self.assertTrue(address != None)
         self.assertEqual(address.id, None)
@@ -109,7 +103,7 @@ class TestCustomerModel(unittest.TestCase):
         self.assertEqual(len(customers), 1)
         # Check for an additional customer
         customer = Customer(first_name="allen", last_name="zhang",
-                            userid="allenzhang", password="devops2022", addresses=[])
+                            userid="allenzhang2", password="devops2022", addresses=[])
         self.assertTrue(customer != None)
         self.assertEqual(customer.id, None)
         customer.create()
@@ -121,9 +115,7 @@ class TestCustomerModel(unittest.TestCase):
     def test_serialize_a_customer(self):
         """Test serialization of a Customer"""
         address = self._create_address()
-        #self.assertEqual(address.id, 1)
         customer = self._create_customer(addresses=[address])
-        #self.assertEqual(customer.addresses, 1)
         data = customer.serialize()
         # Customer assertions
         self.assertNotEqual(data, None)
@@ -145,16 +137,16 @@ class TestCustomerModel(unittest.TestCase):
         self.assertIn("addresses", data)
         self.assertEqual(addresses[0]['id'], address.id)
         self.assertEqual(addresses[0]['customer_id'], address.customer_id)
-        self.assertEqual(addresses[0]['address'], address.address)
+        self.assertEqual(addresses[0]['street'], address.street)
+        self.assertEqual(addresses[0]['city'], address.city)
+        self.assertEqual(addresses[0]['state'], address.state)
+        self.assertEqual(addresses[0]['postal_code'], address.postal_code)
     
     def test_deserialize_a_customer(self):
         """Test deserialization of a Customer"""
         address = self._create_address()
-        #self.assertEqual(address.id, 1)
         customer = self._create_customer(addresses=[address])
-        #self.assertEqual(customer.addresses, 1)
         serial_customer = customer.serialize()
-        #self.assertEqual(serial_customer['addresses'], 1)
         new_customer = Customer()
         new_customer.deserialize(serial_customer)
 
@@ -165,7 +157,10 @@ class TestCustomerModel(unittest.TestCase):
         self.assertEqual(new_customer.last_name, customer.last_name)
         self.assertEqual(new_customer.userid, customer.userid)
         self.assertEqual(new_customer.password, customer.password)
-        self.assertEqual(new_customer.addresses[0].address, address.address)
+        self.assertEqual(new_customer.addresses[0].street, address.street)
+        self.assertEqual(new_customer.addresses[0].city, address.city)
+        self.assertEqual(new_customer.addresses[0].state, address.state)
+        self.assertEqual(new_customer.addresses[0].postal_code, address.postal_code)
         self.assertEqual(len(new_customer.addresses), 1)
         #self.assertEqual(new_customer.addresses[0].id, address.id)
         self.assertEqual(new_customer.addresses[0].customer_id, address.customer_id)
@@ -254,6 +249,9 @@ class TestCustomerModel(unittest.TestCase):
     def test_list_all(self):
         """Test case to list all customers"""
         customers = CustomerFactory.create_batch(3)
+        customers[0].userid = "firstid"
+        customers[1].userid = "secondid"
+        customers[2].userid = "thirdid"
         for customer in customers:
             customer.create()
         self.assertEqual(len(Customer.all()), 3)
@@ -324,7 +322,10 @@ class TestCustomerModel(unittest.TestCase):
         self.assertEqual(len(customers), 1)
 
         new_customer = Customer.find(customer.id)
-        self.assertEqual(new_customer.addresses[0].address, address.address)
+        self.assertEqual(new_customer.addresses[0].street, address.street)
+        self.assertEqual(new_customer.addresses[0].city, address.city)
+        self.assertEqual(new_customer.addresses[0].state, address.state)
+        self.assertEqual(new_customer.addresses[0].postal_code, address.postal_code)
 
         address2 = AddressFactory()
         customer.addresses.append(address2)
@@ -332,7 +333,10 @@ class TestCustomerModel(unittest.TestCase):
 
         new_customer = Customer.find(customer.id)
         self.assertEqual(len(new_customer.addresses), 2)
-        self.assertEqual(new_customer.addresses[1].address, address2.address)
+        self.assertEqual(new_customer.addresses[1].street, address2.street)
+        self.assertEqual(new_customer.addresses[1].city, address2.city)
+        self.assertEqual(new_customer.addresses[1].state, address2.state)
+        self.assertEqual(new_customer.addresses[1].postal_code, address2.postal_code)
 
     def test_update_customer_address(self):
         """ Update a customers address """
@@ -351,15 +355,18 @@ class TestCustomerModel(unittest.TestCase):
         # Fetch it back
         customer = Customer.find(customer.id)
         old_address = customer.addresses[0]
-        self.assertEqual(old_address.address, address.address)
+        self.assertEqual(old_address.street, address.street)
+        self.assertEqual(old_address.city, address.city)
+        self.assertEqual(old_address.state, address.state)
+        self.assertEqual(old_address.postal_code, address.postal_code)
 
-        old_address.address = "XX"
+        old_address.street = "XX"
         customer.update()
 
         # Fetch it back again
         customer = Customer.find(customer.id)
         address = customer.addresses[0]
-        self.assertEqual(address.address, "XX")
+        self.assertEqual(address.street, "XX")
 
     def test_delete_customer_address(self):
         """ Delete an customers address """
