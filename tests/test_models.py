@@ -280,6 +280,15 @@ class TestCustomerModel(unittest.TestCase):
         # Fetch it back
         customer = Customer.find_or_404(customer.id)
         self.assertEqual(customer.id, 1)
+
+    def test_find_by_id(self):
+        """ Find by unique id """
+        customer = CustomerFactory()
+        customer.create()
+
+        # Fetch it back by name
+        same_customer = Customer.find_by_id(customer.id)[0]
+        self.assertEqual(same_customer.id, customer.id)
     
     def test_find_by_first_name(self):
         """ Find by first_name """
@@ -300,6 +309,16 @@ class TestCustomerModel(unittest.TestCase):
         same_customer = Customer.find_by_last_name(customer.last_name)[0]
         self.assertEqual(same_customer.id, customer.id)
         self.assertEqual(same_customer.last_name, customer.last_name)
+
+    def test_find_by_userid(self):
+        """ Find by userid """
+        customer = CustomerFactory()
+        customer.create()
+
+        # Fetch it back by name
+        same_customer = Customer.find_by_userid(customer.userid)[0]
+        self.assertEqual(same_customer.id, customer.id)
+        self.assertEqual(same_customer.userid, customer.userid)
 
     def test_delete_a_customer(self):
         """Delete a Customer"""

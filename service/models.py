@@ -202,6 +202,12 @@ class Customer(db.Model, PersistentBase):
         return self
     
     @classmethod
+    def find_by_id(cls, id):
+        """ Returns all Customer with the given unique id """
+        logger.info("Processing lookup for id %s ...", id)
+        return cls.query.filter(cls.id == id)
+
+    @classmethod
     def find_by_first_name(cls, first_name):
         """ Returns all Customer with the given first name """
         logger.info("Processing lookup for first_name %s ...", first_name)
@@ -212,3 +218,9 @@ class Customer(db.Model, PersistentBase):
         """ Returns all Customer with the given last name """
         logger.info("Processing lookup for last_name %s ...", last_name)
         return cls.query.filter(cls.last_name == last_name)
+
+    @classmethod
+    def find_by_userid(cls, userid):
+        """ Returns all Customer with the given userid """
+        logger.info("Processing lookup for userid %s ...", userid)
+        return cls.query.filter(cls.userid == userid)
