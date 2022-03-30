@@ -5,6 +5,7 @@ All of the models are stored in this module
 """
 import logging
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.exc import IntegrityError
 
 logger = logging.getLogger("flask.app")
 
@@ -28,16 +29,28 @@ class PersistentBase():
         """
         logger.info("Creating %s", self.first_name)
         self.id = None  # id must be none to generate next primary key
-        db.session.add(self)
-        db.session.commit()
+        try:
+            db.session.add(self)
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+            raise DataValidationError(
+                "Userid already exists!"
+            )
+            # error, there already is a customer with this userid
 
     def update(self):
         """
         Updates a Customer to the database
         """
-        #logger.info("Saving %s", self.first_name)
-        db.session.commit()
-
+        try:
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+            raise DataValidationError(
+                "Userid already exists!"
+            )
+            # error, there already is a customer with this userid
     def delete(self):
         """ Removes a Customer from the data store """
         #logger.info("Deleting %s", self.first_name)

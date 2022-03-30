@@ -392,3 +392,42 @@ class TestCustomerModel(unittest.TestCase):
         # Fetch it back again
         customer = Customer.find(customer.id)
         self.assertEqual(len(customer.addresses), 0)
+    
+    def test_create_customer_same_userid(self):
+        """Create customer with same userid"""
+        customer = Customer(first_name="allen", last_name="zhang",
+                            userid="allenzhang", password="devops2022")
+        self.assertTrue(customer != None)
+        self.assertEqual(customer.id, None)
+        self.assertEqual(customer.first_name, "allen")
+        self.assertEqual(customer.last_name, "zhang")
+        self.assertEqual(customer.userid, "allenzhang")
+        self.assertEqual(customer.password, "devops2022")
+        customer.create()
+        customer = Customer(first_name="allen", last_name="zhang",
+                            userid="allenzhang", password="customers2022")
+        self.assertRaises(DataValidationError, customer.create)
+
+    def test_update_a_customer_to_existing_userid(self):
+        """Update customer userid to existing userid"""
+
+        customer = Customer(first_name="allen", last_name="zhang",
+                            userid="allenzhang", password="devops2022")
+        self.assertTrue(customer != None)
+        self.assertEqual(customer.id, None)
+        self.assertEqual(customer.first_name, "allen")
+        self.assertEqual(customer.last_name, "zhang")
+        self.assertEqual(customer.userid, "allenzhang")
+        self.assertEqual(customer.password, "devops2022")
+        customer.create()
+        customer = Customer(first_name="allen", last_name="zhang",
+                            userid="allenzhang2", password="customers2022")
+        self.assertTrue(customer != None)
+        self.assertEqual(customer.id, None)
+        self.assertEqual(customer.first_name, "allen")
+        self.assertEqual(customer.last_name, "zhang")
+        self.assertEqual(customer.userid, "allenzhang2")
+        self.assertEqual(customer.password, "customers2022")
+        customer.create()
+        customer.userid="allenzhang"
+        self.assertRaises(DataValidationError, customer.update)
