@@ -92,7 +92,8 @@ def create_customers():
     app.logger.info("Request to create a customer")
     check_content_type("application/json")
     customer = Customer()
-    customer.deserialize(request.get_json())
+    request_body = request.get_json()
+    customer.deserialize(request_body)
     customer.create()
     message = customer.serialize()
     location_url = url_for("get_customers", customer_id=customer.id, _external=True)
@@ -116,11 +117,60 @@ def update_customers(customer_id):
     app.logger.info("Requesting to update a customer")
     check_content_type("application/json")
     customer = Customer.find(customer_id)
+    if not customer:
+        raise NotFound("Customer with id '{}' was not found.".format(customer_id))
     customer.deserialize(request.get_json())
     customer.customer_id = customer_id
     customer.update()
     app.logger.info("Updated customer with id %s", customer.customer_id)
     
+    
+    return customer.serialize(), status.HTTP_200_OK
+
+######################################################################
+# ACTIVATE AN EXISTING CUSTOMER
+######################################################################
+@app.route("/customers/<int:customer_id>/activate", methods=["PUT"])
+def activate_customers(customer_id):
+    """
+    Activate an existing Customer
+    This endpoint will update a Customer's active field
+    """
+
+    app.logger.info("Requesting to update a customer")
+    check_content_type("application/json")
+    customer = Customer.find(customer_id)
+    #customer.deserialize(request.get_json())
+    if not customer:
+        raise NotFound("Customer with id '{}' was not found.".format(customer_id))
+    customer.customer_id = customer_id
+    customer.active = True
+    customer.update()
+    app.logger.info("Updated customer with id %s", customer.customer_id)
+    
+    
+    return customer.serialize(), status.HTTP_200_OK
+
+######################################################################
+# ACTIVATE AN EXISTING CUSTOMER
+######################################################################
+@app.route("/customers/<int:customer_id>/deactivate", methods=["PUT"])
+def deactivate_customers(customer_id):
+    """
+    Deactivate an existing Customer
+    This endpoint will update a Customer's active field
+    """
+
+    app.logger.info("Requesting to update a customer")
+    check_content_type("application/json")
+    customer = Customer.find(customer_id)
+    #customer.deserialize(request.get_json())
+    if not customer:
+        raise NotFound("Customer with id '{}' was not found.".format(customer_id))
+    customer.customer_id = customer_id
+    customer.active = False
+    customer.update()
+    app.logger.info("Updated customer with id %s", customer.customer_id)
     
     return customer.serialize(), status.HTTP_200_OK
 

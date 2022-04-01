@@ -372,3 +372,63 @@ class TestCustomerServer(TestCase):
             content_type="application/json"
         )
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_activate_existing_customer(self):
+        """Activate existing customer"""
+
+        random_customers = CustomerFactory()
+        random_customers.active = False
+        resp = self.app.post(
+            BASE_URL, json=random_customers.serialize(), content_type=CONTENT_TYPE_JSON
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        
+        new_customer = resp.get_json()
+        self.assertEqual(new_customer["active"], False)
+
+        resp = self.app.put("/customers/{}/activate".format(new_customer["id"]), json = {}, content_type = CONTENT_TYPE_JSON)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        updated_customer  = resp.get_json()
+        self.assertEqual(new_customer["id"],updated_customer["id"])
+        self.assertEqual(new_customer["first_name"], updated_customer["first_name"])
+        self.assertEqual(updated_customer["active"], True)
+
+    def test_activate_non_existing_customer(self):
+        """Activate non existing customer"""
+
+        random_customers = CustomerFactory()
+        random_customers.active = False
+        resp = self.app.post(
+            BASE_URL, json=random_customers.serialize(), content_type=CONTENT_TYPE_JSON
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        
+        new_customer = resp.get_json()
+        self.assertEqual(new_customer["active"], False)
+
+        resp = self.app.put("/customers/{}/activate".format("123"), json = {}, content_type = CONTENT_TYPE_JSON)
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+    
+    def test_deactivate_existing_customer(self):
+        """Deactivate existing customer"""
+
+        random_customers = CustomerFactory()
+        random_customers.active = True
+        resp = self.app.post(
+            BASE_URL, json=random_customers.serialize(), content_type=CONTENT_TYPE_JSON
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        
+        new_customer = resp.get_json()
+        self.assertEqual(new_customer["active"], True)
+
+        resp = self.app.put("/customers/{}/deactivate".format(new_customer["id"]), json = {}, content_type = CONTENT_TYPE_JSON)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        updated_customer  = resp.get_json()
+        self.assertEqual(new_customer["id"],updated_customer["id"])
+        self.assertEqual(new_customer["first_name"], updated_customer["first_name"])
+        self.assertEqual(updated_customer["active"], False)
+
+        

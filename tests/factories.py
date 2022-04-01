@@ -32,6 +32,7 @@ class CustomerFactory(factory.Factory):
     last_name = FuzzyChoice(choices=["zhang", "doshi", "rofrano", "patel"])
     userid = FuzzyChoice(choices=["devops2022", "customers2022", "random2022", "username2022"])
     password = factory.Faker("password")
+    active = FuzzyChoice(choices=[True, False])
     addresses = []
 
 class AddressFactory(factory.Factory):
