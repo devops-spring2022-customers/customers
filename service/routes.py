@@ -50,9 +50,18 @@ def list_customers():
     """Returns all of the customer"""
     app.logger.info("Request for Csutomer list")
     customers = []
+    id = request.args.get("id")
     first_name = request.args.get("first_name")
-    if first_name:
-        customers = Customer.find_by_name(first_name)
+    last_name = request.args.get("last_name")
+    userid = request.args.get("userid")
+    if id:
+        customers = Customer.find_by_id(id)
+    elif first_name:
+        customers = Customer.find_by_first_name(first_name)
+    elif last_name:
+        customers = Customer.find_by_last_name(last_name)
+    elif userid:
+        customers = Customer.find_by_userid(userid)
     else:
         customers = Customer.all()
 
