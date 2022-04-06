@@ -43,4 +43,7 @@ class AddressFactory(factory.Factory):
         model = Address
 
     id = factory.Sequence(lambda n: n)
-    address = "2022 New York"
+    street = FuzzyChoice(choices=["2022 New York Street", "2022 Devops Street", "2022 Jersey Road"])
+    city = FuzzyChoice(choices=["Jersey City", "New York City"])
+    state = FuzzyChoice(choices=["New Jersey", "New York"])
+    postal_code = FuzzyChoice(choices=["07310", "05382", "09111"])
