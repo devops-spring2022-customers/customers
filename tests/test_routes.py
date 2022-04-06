@@ -65,6 +65,7 @@ class TestCustomerServer(TestCase):
         customers = []
         for _ in range(count):
             test_customer = CustomerFactory()
+            test_customer.userid = "userid{}".format(_)
             resp = self.app.post(
                 BASE_URL, json=test_customer.serialize(), content_type=CONTENT_TYPE_JSON
             )
@@ -277,7 +278,10 @@ class TestCustomerServer(TestCase):
         data = resp.get_json()
         logging.debug(data)
         self.assertEqual(data["customer_id"], customer.id)
-        self.assertEqual(data["address"], address.address)
+        self.assertEqual(data["street"], address.street)
+        self.assertEqual(data["city"], address.city)
+        self.assertEqual(data["state"], address.state)
+        self.assertEqual(data["postal_code"], address.postal_code)
 
     def test_get_address(self):
         """ Get an address from a customer """
@@ -305,7 +309,10 @@ class TestCustomerServer(TestCase):
         data = resp.get_json()
         logging.debug(data)
         self.assertEqual(data["customer_id"], customer.id)
-        self.assertEqual(data["address"], address.address)
+        self.assertEqual(data["street"], address.street)
+        self.assertEqual(data["city"], address.city)
+        self.assertEqual(data["state"], address.state)
+        self.assertEqual(data["postal_code"], address.postal_code)
 
     def test_update_address(self):
         """ Update an address on a customer """
@@ -322,7 +329,7 @@ class TestCustomerServer(TestCase):
         data = resp.get_json()
         logging.debug(data)
         address_id = data["id"]
-        data["address"] = "XXXX"
+        data["street"] = "XXXX"
 
         # send the update back
         resp = self.app.put(
@@ -343,7 +350,7 @@ class TestCustomerServer(TestCase):
         logging.debug(data)
         self.assertEqual(data["id"], address_id)
         self.assertEqual(data["customer_id"], customer.id)
-        self.assertEqual(data["address"], "XXXX")
+        self.assertEqual(data["street"], "XXXX")
 
     def test_delete_address(self):
         """ Delete an Address """

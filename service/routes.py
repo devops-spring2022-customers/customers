@@ -37,7 +37,7 @@ def index():
         jsonify(
             name="Customer Demo REST API Service",
             version="1.0",
-            #paths=url_for("list_customers", _external=True),
+            paths=url_for("list_customers", _external=True),
         ),
         status.HTTP_200_OK,
     )
@@ -58,8 +58,6 @@ def list_customers():
 
     results = [customer.serialize() for customer in customers]
     return make_response(jsonify(results), status.HTTP_200_OK)
-
-    #return None
 
 
 ######################################################################
