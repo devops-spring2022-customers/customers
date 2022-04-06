@@ -29,6 +29,9 @@ class PersistentBase():
         """
         logger.info("Creating %s", self.first_name)
         self.id = None  # id must be none to generate next primary key
+        if self.active is None: # default active when created
+            self.active = True
+    
         try:
             db.session.add(self)
             db.session.commit()
@@ -100,11 +103,11 @@ class Address(db.Model,PersistentBase):
     state = db.Column(db.String(64))
     postal_code = db.Column(db.String(64))
 
-    def __repr__(self):
-        return "<Address %r id=[%s] customer[%s]>" % (self.name, self.id, self.customer_id)
+    # def __repr__(self):
+    #     return "<Address %r id=[%s] customer[%s]>" % (self.name, self.id, self.customer_id)
 
-    def __str__(self):
-        return "%s " % (self.address)
+    # def __str__(self):
+    #     return "%s " % (self.address)
         
     def serialize(self):
         """ Serializes a Address into a dictionary """
@@ -156,11 +159,12 @@ class Customer(db.Model, PersistentBase):
     last_name = db.Column(db.String(63), nullable=False)
     userid = db.Column(db.String(63), nullable=True, unique=True)
     password = db.Column(db.String(63), nullable=True)
+    active = db.Column(db.Boolean(), nullable=False)
     addresses = db.relationship('Address', backref='customer', lazy=True)  
 
     def __repr__(self):
         return "<Customer %r id=[%s]>" % (self.first_name, self.id)
-
+    
     def serialize(self):
         """ Serializes a Customer into a dictionary """
         customer = {
@@ -169,12 +173,12 @@ class Customer(db.Model, PersistentBase):
             "last_name": self.last_name,
             "userid": self.userid,
             "password": self.password,
+            "active": self.active,
             "addresses": []
         }
         for address in self.addresses:
             customer["addresses"].append(address.serialize())
         
-            
         return customer
 
     def deserialize(self, data):
@@ -207,6 +211,8 @@ class Customer(db.Model, PersistentBase):
             #     self.userid = data["userid"]
             # if "password" in data:
             #     self.password = data["password"]  
+
+            self.active = data.get("active")
 
             address_list = data.get("addresses")
             for json_address in address_list:
