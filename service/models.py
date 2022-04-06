@@ -5,6 +5,7 @@ All of the models are stored in this module
 """
 import logging
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.exc import IntegrityError
 
 logger = logging.getLogger("flask.app")
 
@@ -28,16 +29,31 @@ class PersistentBase():
         """
         logger.info("Creating %s", self.first_name)
         self.id = None  # id must be none to generate next primary key
-        db.session.add(self)
-        db.session.commit()
+        if self.active is None: # default active when created
+            self.active = True
+    
+        try:
+            db.session.add(self)
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+            raise DataValidationError(
+                "Userid already exists!"
+            )
+            # error, there already is a customer with this userid
 
     def update(self):
         """
         Updates a Customer to the database
         """
-        #logger.info("Saving %s", self.first_name)
-        db.session.commit()
-
+        try:
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+            raise DataValidationError(
+                "Userid already exists!"
+            )
+            # error, there already is a customer with this userid
     def delete(self):
         """ Removes a Customer from the data store """
         #logger.info("Deleting %s", self.first_name)
@@ -82,20 +98,26 @@ class Address(db.Model,PersistentBase):
     # Table Schema
     id = db.Column(db.Integer, primary_key=True)
     customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'), nullable=False)
-    address = db.Column(db.String(64))
+    street = db.Column(db.String(64))
+    city = db.Column(db.String(64))
+    state = db.Column(db.String(64))
+    postal_code = db.Column(db.String(64))
 
-    def __repr__(self):
-        return "<Address %r id=[%s] customer[%s]>" % (self.name, self.id, self.customer_id)
+    # def __repr__(self):
+    #     return "<Address %r id=[%s] customer[%s]>" % (self.name, self.id, self.customer_id)
 
-    def __str__(self):
-        return "%s " % (self.address)
+    # def __str__(self):
+    #     return "%s " % (self.address)
         
     def serialize(self):
         """ Serializes a Address into a dictionary """
         return {
             "id": self.id,
             "customer_id": self.customer_id,
-            "address": self.address,
+            "street": self.street,
+            "city": self.city,
+            "state": self.state,
+            "postal_code": self.postal_code,
         }
 
     def deserialize(self, data):
@@ -105,9 +127,10 @@ class Address(db.Model,PersistentBase):
             data (dict): A dictionary containing the resource data
         """
         try:
-            #self.id = data["id"]
-            #self.customer_id = data["customer_id"]
-            self.address = data["address"]
+            self.street = data["street"]
+            self.city = data["city"]
+            self.state = data["state"]
+            self.postal_code = data["postal_code"]
         except KeyError as error:
             raise DataValidationError("Invalid Address: missing " + error.args[0])
         except TypeError as error:
@@ -134,13 +157,14 @@ class Customer(db.Model, PersistentBase):
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(63), nullable=False)
     last_name = db.Column(db.String(63), nullable=False)
-    userid = db.Column(db.String(63), nullable=True)
+    userid = db.Column(db.String(63), nullable=True, unique=True)
     password = db.Column(db.String(63), nullable=True)
+    active = db.Column(db.Boolean(), nullable=False)
     addresses = db.relationship('Address', backref='customer', lazy=True)  
 
     def __repr__(self):
         return "<Customer %r id=[%s]>" % (self.first_name, self.id)
-
+    
     def serialize(self):
         """ Serializes a Customer into a dictionary """
         customer = {
@@ -149,12 +173,12 @@ class Customer(db.Model, PersistentBase):
             "last_name": self.last_name,
             "userid": self.userid,
             "password": self.password,
+            "active": self.active,
             "addresses": []
         }
         for address in self.addresses:
             customer["addresses"].append(address.serialize())
         
-            
         return customer
 
     def deserialize(self, data):
@@ -180,10 +204,15 @@ class Customer(db.Model, PersistentBase):
                     + str(type(data["last_name"]))
                 )    
             
-            if "userid" in data:
-                self.userid = data["userid"]
-            if "password" in data:
-                self.password = data["password"]  
+            self.userid = data.get("userid")
+            self.password = data.get("password")
+
+            # if "userid" in data:
+            #     self.userid = data["userid"]
+            # if "password" in data:
+            #     self.password = data["password"]  
+
+            self.active = data.get("active")
 
             address_list = data.get("addresses")
             for json_address in address_list:
@@ -202,6 +231,12 @@ class Customer(db.Model, PersistentBase):
         return self
     
     @classmethod
+    def find_by_id(cls, id):
+        """ Returns all Customer with the given unique id """
+        logger.info("Processing lookup for id %s ...", id)
+        return cls.query.filter(cls.id == id)
+
+    @classmethod
     def find_by_first_name(cls, first_name):
         """ Returns all Customer with the given first name """
         logger.info("Processing lookup for first_name %s ...", first_name)
@@ -212,3 +247,9 @@ class Customer(db.Model, PersistentBase):
         """ Returns all Customer with the given last name """
         logger.info("Processing lookup for last_name %s ...", last_name)
         return cls.query.filter(cls.last_name == last_name)
+
+    @classmethod
+    def find_by_userid(cls, userid):
+        """ Returns all Customer with the given userid """
+        logger.info("Processing lookup for userid %s ...", userid)
+        return cls.query.filter(cls.userid == userid)

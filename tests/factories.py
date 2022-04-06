@@ -32,6 +32,7 @@ class CustomerFactory(factory.Factory):
     last_name = FuzzyChoice(choices=["zhang", "doshi", "rofrano", "patel"])
     userid = FuzzyChoice(choices=["devops2022", "customers2022", "random2022", "username2022"])
     password = factory.Faker("password")
+    active = FuzzyChoice(choices=[True, False])
     addresses = []
 
 class AddressFactory(factory.Factory):
@@ -42,4 +43,7 @@ class AddressFactory(factory.Factory):
         model = Address
 
     id = factory.Sequence(lambda n: n)
-    address = "2022 New York"
+    street = FuzzyChoice(choices=["2022 New York Street", "2022 Devops Street", "2022 Jersey Road"])
+    city = FuzzyChoice(choices=["Jersey City", "New York City"])
+    state = FuzzyChoice(choices=["New Jersey", "New York"])
+    postal_code = FuzzyChoice(choices=["07310", "05382", "09111"])
