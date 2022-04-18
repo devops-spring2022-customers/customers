@@ -12,6 +12,7 @@ services:
     #   - 8000:8000
     volumes:
       - ..:/app
+      - ~/.bluemix/:/home/devops/.bluemix/
     command: sleep infinity
     environment:
       FLASH_APP: service:app
@@ -25,8 +26,8 @@ services:
 
   postgres:
     image: postgres:alpine
-    ports:
-      - 5432
+    # ports:
+    #   - 5432
     environment:
       POSTGRES_PASSWORD: postgres
     volumes:
