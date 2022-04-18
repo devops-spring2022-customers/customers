@@ -17,11 +17,11 @@ $(function () {
             $("#customer_active").val("false");
         }
         if (res.addresses.length > 0){
-            $("#customer_addressid").val(res.addresses[0].id);
-            $("#customer_street").val(res.addresses[0].street);
-            $("#customer_city").val(res.addresses[0].city);
-            $("#customer_state").val(res.addresses[0].state);
-            $("#customer_postal_code").val(res.addresses[0].postal_code);
+            $("#customer_addressid").val(res.addresses[res.addresses.length-1].id);
+            $("#customer_street").val(res.addresses[res.addresses.length-1].street);
+            $("#customer_city").val(res.addresses[res.addresses.length-1].city);
+            $("#customer_state").val(res.addresses[res.addresses.length-1].state);
+            $("#customer_postal_code").val(res.addresses[res.addresses.length-1].postal_code);
         }
     }
 
