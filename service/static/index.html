@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Pet Demo RESTful Service</title>
+    <title>Customer RESTful Service</title>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -10,7 +10,7 @@
   <body>
     <div class="container">
       <div class="page-header">
-          <h1>Pet Demo REST API Service</h1>
+          <h1>Customer REST API Service</h1>
       </div>
 
       <!-- Flash Message -->
@@ -22,13 +22,13 @@
 
       <!-- FORM -->
       <div class="col-md-12" id="form_data">
-        <h3>Create, Retrieve, Update, and Delete a Pet:</h3>
+        <h3>Create, Retrieve, Update, and Delete a Customer:</h3>
         <div class="well">
           <div class="form-horizontal">
             <div class="form-group">
-              <label class="control-label col-sm-2" for="pet_id">Pet ID:</label>
+              <label class="control-label col-sm-2" for="customer_id">Customer ID:</label>
               <div class="col-sm-6">
-                <input type="text" class="form-control" id="pet_id" placeholder="Enter ID of Pet">
+                <input type="text" class="form-control" id="customer_id" placeholder="Enter ID of Customer">
               </div>
               <div class="col-sm-4">
                 <button type="submit" class="btn btn-primary" id="retrieve-btn">Retrieve</button>
@@ -39,53 +39,85 @@
 
           <div class="form-horizontal">
 
-            <!-- NAME -->
+            <!-- FIRST NAME -->
             <div class="form-group">
-              <label class="control-label col-sm-2" for="pet_name">Name:</label>
+              <label class="control-label col-sm-2" for="customer_first_name">First Name:</label>
               <div class="col-sm-10">
-                <input type="text" class="form-control" id="pet_name" placeholder="Enter name for Pet">
+                <input type="text" class="form-control" id="customer_first_name" placeholder="Enter first name for Customer">
               </div>
             </div>
 
-            <!-- CATEGORY -->
+            <!-- LAST NAME -->
             <div class="form-group">
-              <label class="control-label col-sm-2" for="pet_category">Category:</label>
+              <label class="control-label col-sm-2" for="customer_last_name">Last Name:</label>
               <div class="col-sm-10">
-                <input type="text" class="form-control" id="pet_category" placeholder="Enter category for Pet">
+                <input type="text" class="form-control" id="customer_last_name" placeholder="Enter last name for Customer">
               </div>
             </div>
 
-            <!-- AVAILABLE -->
+            <!-- USERID -->
             <div class="form-group">
-              <label class="control-label col-sm-2" for="pet_available">Available:</label>
+              <label class="control-label col-sm-2" for="customer_userid">User ID:</label>
               <div class="col-sm-10">
-                <select class="form-control" id="pet_available">
-                  <option value="true" selected>True</option>
-                  <option value="false">False</option>
-                </select>
+                <input type="text" class="form-control" id="customer_userid" placeholder="Enter User ID for Customer">
               </div>
             </div>
 
-            <!-- GENDER -->
+            <!-- PASSWORD -->
             <div class="form-group">
-              <label class="control-label col-sm-2" for="pet_gender">Gender:</label>
+              <label class="control-label col-sm-2" for="customer_password">Password:</label>
               <div class="col-sm-10">
-                <select class="form-control" id="pet_gender">
-                  <option value="UNKNOWN" selected>Unknown</option>
-                  <option value="MALE">Male</option>
-                  <option value="FEMALE">Female</option>
-                </select>
+                <input type="text" class="form-control" id="customer_password" placeholder="Enter Password for Customer">
               </div>
             </div>
 
-            <!-- BIRTHDAY -->
+            <!-- ACTIVE -->
             <div class="form-group">
-              <label class="control-label col-sm-2" for="pet_birthday">Birthday:</label>
+              <label class="control-label col-sm-2" for="customer_active">Active:</label>
               <div class="col-sm-10">
-                <input type="date" class="form-control" id="pet_birthday" placeholder="2020-04-01">
+                <input type="text" class="form-control" id="customer_active" placeholder="Enter Status for Customer">
               </div>
             </div>
 
+            <!-- ADDRESSID -->
+            <div class="form-group">
+              <label class="control-label col-sm-2" for="customer_addressid">Address ID:</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="customer_addressid" placeholder="Enter Address ID for Customer">
+              </div>
+            </div>
+
+            <!-- STREET -->
+            <div class="form-group">
+              <label class="control-label col-sm-2" for="customer_street">Street:</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="customer_street" placeholder="Enter Street for Customer">
+              </div>
+            </div>
+
+            <!-- CITY -->
+            <div class="form-group">
+              <label class="control-label col-sm-2" for="customer_city">State:</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="customer_city" placeholder="Enter State for Customer">
+              </div>
+            </div>
+
+            <!-- STATE -->
+            <div class="form-group">
+              <label class="control-label col-sm-2" for="customer_state">City:</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="customer_state" placeholder="Enter City for Customer">
+              </div>
+            </div>
+
+            <!-- POSTAL CODE -->
+            <div class="form-group">
+              <label class="control-label col-sm-2" for="customer_postal_code">Postal Code:</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="customer_postal_code" placeholder="Enter Postal Code for Customer">
+              </div>
+            </div>
 
             <!-- SUBMIT BUTTONS -->
             <div class="form-group">
@@ -106,11 +138,11 @@
           <thead>
           <tr>
             <th class="col-md-1">ID</th>
-            <th class="col-md-4">Name</th>
-            <th class="col-md-4">Category</th>
-            <th class="col-md-3">Available</th>
-            <th class="col-md-3">Gender</th>
-            <th class="col-md-3">Birthday</th>
+            <th class="col-md-4">First Name</th>
+            <th class="col-md-4">Last Name</th>
+            <th class="col-md-3">User ID</th>
+            <th class="col-md-3">Password</th>
+            <th class="col-md-3">Active</th>
           </tr>
           </thead>
         </table>

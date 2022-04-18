@@ -33,14 +33,15 @@ from . import app
 def index():
     """ Root URL response """
     app.logger.info("Request for Root URL")
-    return (
-        jsonify(
-            name="Customer Demo REST API Service",
-            version="1.0",
-            paths=url_for("list_customers", _external=True),
-        ),
-        status.HTTP_200_OK,
-    )
+    return app.send_static_file("index.html")
+    # return (
+    #     jsonify(
+    #         name="Customer Demo REST API Service",
+    #         version="1.0",
+    #         paths=url_for("list_customers", _external=True),
+    #     ),
+    #     status.HTTP_200_OK,
+    # )
 
 ######################################################################
 # LIST ALL CUSTOMERS
@@ -48,7 +49,7 @@ def index():
 @app.route("/customers", methods=["GET"])
 def list_customers():
     """Returns all of the customer"""
-    app.logger.info("Request for Csutomer list")
+    app.logger.info("Request for Customer list")
     customers = []
     id = request.args.get("id")
     first_name = request.args.get("first_name")
