@@ -1,3 +1,7 @@
+
+[![Build Status](https://github.com/devops-spring2022-customers/customers/actions/workflows/workflow.yml/badge.svg)](https://github.com/devops-spring2022-customers/customers/actions)
+[![codecov](https://codecov.io/gh/devops-spring2022-customers/customers/branch/master/graph/badge.svg?token=8HK1MKH1PX)](https://codecov.io/gh/devops-spring2022-customers/customers)
+
 # Customers Microservice
 
 This is a Customer microservice for users and developers.
