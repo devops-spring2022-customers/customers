@@ -56,7 +56,7 @@ To retrieve customer address:
 curl -X GET localhost:8000/customers/{customer_id}/addresses/{address_id}
 ```
 
-To retrieve all customer
+To retrieve all customers
 ```console
 curl -X GET localhost:8000/customers
 ```
