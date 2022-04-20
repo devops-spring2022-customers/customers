@@ -77,12 +77,11 @@ class TestCustomerServer(TestCase):
             customers.append(test_customer)
         return customers
 
-    # def test_index(self):
-    #     """Test the Home Page"""
-    #     resp = self.app.get("/")
-    #     self.assertEqual(resp.status_code, status.HTTP_200_OK)
-    #     data = resp.get_json()
-    #     self.assertEqual(data["name"], "Customer Demo REST API Service")
+    def test_index(self):
+        """ Test the index page """
+        resp = self.app.get('/')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        # self.assertIn('Customer DEMO REST API Service', resp.data)
 
     def test_get_customer_not_found(self):
         """Get a Customer thats not found"""
@@ -126,11 +125,6 @@ class TestCustomerServer(TestCase):
         """Create a Customer with missing data"""
         resp = self.app.post(BASE_URL, json={}, content_type=CONTENT_TYPE_JSON)
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
-
-    def test_create_customer_no_content_type(self):
-        """Create a Customer with no content type"""
-        resp = self.app.post(BASE_URL)
-        self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 
     def test_create_customer_bad_first_name(self):
         """ Create a Customer with bad first name """
@@ -192,16 +186,6 @@ class TestCustomerServer(TestCase):
         )
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_unsupported_media_type(self):
-        """ Send wrong media type """
-        customer = CustomerFactory()
-        resp = self.app.post(
-            "/customers", 
-            json=customer.serialize(), 
-            content_type="test/html"
-        )
-        self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
-
     def test_method_not_allowed(self):
         """ Make an illegal method call """
         resp = self.app.put(
@@ -222,6 +206,27 @@ class TestCustomerServer(TestCase):
     def test_delete_customer(self):
         """Delete a customer"""
         test_customer = self._create_customers(1)[0]
+        resp = self.app.delete(
+            "{0}/{1}".format(BASE_URL, test_customer.id), content_type=CONTENT_TYPE_JSON
+        )
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(len(resp.data), 0)
+        # make sure they are deleted
+        resp = self.app.get(
+            "{0}/{1}".format(BASE_URL, test_customer.id), content_type=CONTENT_TYPE_JSON
+        )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_delete_customer_with_addr(self):
+        """Delete a customer with address"""
+        test_customer = self._create_customers(1)[0]
+        # Add address to current customer
+        address = AddressFactory()
+        resp = self.app.post(
+            "/customers/{}/addresses".format(test_customer.id), 
+            json=address.serialize(), 
+            content_type="application/json"
+        )
         resp = self.app.delete(
             "{0}/{1}".format(BASE_URL, test_customer.id), content_type=CONTENT_TYPE_JSON
         )
@@ -437,5 +442,6 @@ class TestCustomerServer(TestCase):
         self.assertEqual(new_customer["id"],updated_customer["id"])
         self.assertEqual(new_customer["first_name"], updated_customer["first_name"])
         self.assertEqual(updated_customer["active"], False)
+        
 
         
