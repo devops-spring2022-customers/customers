@@ -50,8 +50,6 @@ $(function () {
     // ****************************************
 
     $("#create-btn").click(function () {
-
-
         let first_name = $("#customer_first_name").val();
         let last_name = $("#customer_last_name").val();
         let user_id = $("#customer_userid").val();
