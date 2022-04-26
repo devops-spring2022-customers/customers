@@ -25,8 +25,8 @@
 applications:
 - name: nyu-customers-service-sp2203
   path: .
-  instances: 1
-  memory: 1024M
+  instances: 2
+  memory: 512M
   routes:
   - route: nyu-customers-service-sp2203.us-south.cf.appdomain.cloud
   disk_quota: 1024M
