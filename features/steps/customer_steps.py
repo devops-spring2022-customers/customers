@@ -40,8 +40,15 @@ def step_impl(context, element_name, text_string):
 @then('the "{element_name}" field should be empty')
 def step_impl(context, element_name):
     element_id = ID_PREFIX + element_name.lower().replace(' ', '_')
-    element = context.driver.find_element_by_id(element_id)
-    expect(element.get_attribute('value')).to_be(u'')
+    found = WebDriverWait(context.driver, context.WAIT_SECONDS).until(
+        expected_conditions.text_to_be_present_in_element(
+            (By.ID, element_id),
+            ''
+        )
+    )
+    expect(found).to_be(True)
+    #element = context.driver.find_element_by_id(element_id)
+    #expect(element.get_attribute('value')).to_be(u'')
 
 
 # ##################################################################
