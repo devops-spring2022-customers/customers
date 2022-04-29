@@ -52,10 +52,10 @@ $(function () {
     $("#create-btn").click(function () {
         let first_name = $("#customer_first_name").val();
         let last_name = $("#customer_last_name").val();
-        let user_id = $("#customer_userid").val();
+        let userid = $("#customer_userid").val();
         let password = $("#customer_password").val();
         let active = true;
-        if ($("#customer_active").val("") == "false"){
+        if ($("#customer_active").val() == "false"){
             active = false;
         }
         let addresses = [];
@@ -63,7 +63,7 @@ $(function () {
         let data = {
             "first_name": first_name,
             "last_name": last_name,
-            "userid": user_id,
+            "userid": userid,
             "password": password,
             "active": active,
             "addresses": addresses
@@ -94,22 +94,25 @@ $(function () {
     // ****************************************
 
     $("#update-btn").click(function () {
-
+        let customer_id = $("#customer_id").val();
         let first_name = $("#customer_first_name").val();
         let last_name = $("#customer_last_name").val();
-        let user_id = $("#customer_userid").val();
+        let userid = $("#customer_userid").val();
         let password = $("#customer_password").val();
         let active = true;
         if ($("#customer_active").val("") == "false"){
             active = false;
         }
 
+        let addresses = [];
+
         let data = {
             "first_name": first_name,
             "last_name": last_name,
-            "userid": user_id,
+            "userid": userid,
             "password": password,
-            "active": active
+            "active": active,
+            "addresses": addresses
         };
 
         $("#flash_message").empty();
@@ -190,6 +193,92 @@ $(function () {
     });
 
     // ****************************************
+    // Activate a Customer
+    // ****************************************
+
+    $("#activate-btn").click(function () {
+        let customer_id = $("#customer_id").val();
+        let first_name = $("#customer_first_name").val();
+        let last_name = $("#customer_last_name").val();
+        let userid = $("#customer_userid").val();
+        let password = $("#customer_password").val();
+        let active = true;
+
+        let addresses = [];
+
+        let data = {
+            "first_name": first_name,
+            "last_name": last_name,
+            "userid": userid,
+            "password": password,
+            "active": active,
+            "addresses": addresses
+        };
+
+        $("#flash_message").empty();
+
+        let ajax = $.ajax({
+                type: "PUT",
+                url: `/customers/${customer_id}`,
+                contentType: "application/json",
+                data: JSON.stringify(data)
+            })
+
+        ajax.done(function(res){
+            update_form_data(res)
+            flash_message("Success")
+        });
+
+        ajax.fail(function(res){
+            flash_message(res.responseJSON.message)
+        });
+
+    });
+
+    // ****************************************
+    // Activate a Customer
+    // ****************************************
+
+    $("#deactivate-btn").click(function () {
+        let customer_id = $("#customer_id").val();
+        let first_name = $("#customer_first_name").val();
+        let last_name = $("#customer_last_name").val();
+        let userid = $("#customer_userid").val();
+        let password = $("#customer_password").val();
+        let active = false;
+
+        let addresses = [];
+
+        let data = {
+            "first_name": first_name,
+            "last_name": last_name,
+            "userid": userid,
+            "password": password,
+            "active": active,
+            "addresses": addresses
+        };
+
+        $("#flash_message").empty();
+
+        let ajax = $.ajax({
+                type: "PUT",
+                url: `/customers/${customer_id}`,
+                contentType: "application/json",
+                data: JSON.stringify(data)
+            })
+
+        ajax.done(function(res){
+            update_form_data(res)
+            flash_message("Success")
+        });
+
+        ajax.fail(function(res){
+            flash_message(res.responseJSON.message)
+        });
+
+    });
+
+    // ****************************************
     // Clear the form
     // ****************************************
 
@@ -207,7 +296,7 @@ $(function () {
 
         let first_name = $("#customer_first_name").val();
         let last_name = $("#customer_last_name").val();
-        let user_id = $("#customer_userid").val();
+        let userid = $("#customer_userid").val();
 
         let queryString = ""
 
@@ -221,11 +310,11 @@ $(function () {
                 queryString += 'last_name=' + last_name
             }
         }
-        if (user_id) {
+        if (userid) {
             if (queryString.length > 0) {
-                queryString += '&user_id=' + user_id
+                queryString += '&userid=' + userid
             } else {
-                queryString += 'user_id=' + user_id
+                queryString += 'userid=' + userid
             }
         }
 
@@ -234,7 +323,7 @@ $(function () {
         let ajax = $.ajax({
             type: "GET",
             url: `/customers?${queryString}`,
-            contentType: "application/json",
+            //contentType: "application/json",
             data: ''
         })
 

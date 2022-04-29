@@ -8,32 +8,26 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.support import expected_conditions
+import time
 
 ID_PREFIX = 'customer_'
 
-@given(u'the server is started')
+@when(u'I visit the "Home Page"')
 def step_impl(context):
-    context.base_url = os.getenv(
-        'BASE_URL',
-        'http://localhost:8080'
-    )
-    context.resp = requests.get(context.base_url + '/')
-    assert context.resp.status_code == 200
-
-@when(u'I visit the "home page"')
-def step_impl(context):
-    context.resp = requests.get(context.base_url + '/')
-    assert context.resp.status_code == 200
+    context.driver.get(context.base_url)
 
 
-@then(u'I should see "{message}"')
+@then('I should see "{message}" in the title')
 def step_impl(context, message):
-    assert message in str(context.resp.text)
+    expect(context.driver.title).to_contain(message)
 
 
 @then(u'I should not see "{message}"')
 def step_impl(context, message):
-    assert message not in str(context.resp.text)
+    elements = context.driver.find_elements(By.TAG_NAME, 'body')
+    body = elements[0].text
+    error_msg = "I should not see '%s' in '%s'" % (message, body)
+    ensure(message in body, False, error_msg)
 
 
 @when('I set the "{element_name}" to "{text_string}"')
@@ -50,13 +44,13 @@ def step_impl(context, element_name):
     expect(element.get_attribute('value')).to_be(u'')
 
 
-##################################################################
-# This code works because of the following naming convention:
-# The buttons have an id in the html hat is the button text
-# in lowercase followed by '-btn' so the Clean button has an id of
-# id='clear-btn'. That allows us to lowercase the name and add '-btn'
-# to get the element id of any button
-##################################################################
+# ##################################################################
+# # This code works because of the following naming convention:
+# # The buttons have an id in the html hat is the button text
+# # in lowercase followed by '-btn' so the Clean button has an id of
+# # id='clear-btn'. That allows us to lowercase the name and add '-btn'
+# # to get the element id of any button
+# ##################################################################
 
 @when('I press the "{button}" button')
 def step_impl(context, button):
@@ -90,9 +84,9 @@ def step_impl(context, message):
     expect(found).to_be(True)
 
 
-##################################################################
-# These two function simulate copy and paste
-##################################################################
+# ##################################################################
+# # These two function simulate copy and paste
+# ##################################################################
 @when('I copy the "{element_name}" field')
 def step_impl(context, element_name):
     element_id = ID_PREFIX + element_name.lower().replace(' ', '_')
@@ -111,12 +105,12 @@ def step_impl(context, element_name):
     element.clear()
     element.send_keys(context.clipboard)
 
-##################################################################
-# This code works because of the following naming convention:
-# The id field for text input in the html is the element name
-# prefixed by ID_PREFIX so the Name field has an id='pet_name'
-# We can then lowercase the name and prefix with pet_ to get the id
-##################################################################
+# ##################################################################
+# # This code works because of the following naming convention:
+# # The id field for text input in the html is the element name
+# # prefixed by ID_PREFIX so the Name field has an id='pet_name'
+# # We can then lowercase the name and prefix with pet_ to get the id
+# ##################################################################
 
 @then('I should see "{text_string}" in the "{element_name}" field')
 def step_impl(context, text_string, element_name):
@@ -139,17 +133,14 @@ def step_impl(context, element_name, text_string):
     element.send_keys(text_string)
 
 
-
-
 @given('the following customers')
 def step_impl(context):
     """ Delete all Customers and load new ones """
     headers = {'Content-Type': 'application/json'}
     # list all of the customers and delete them one by one
-    context.resp = requests.get(context.base_url + '/customers', headers=headers)
+    context.resp = requests.get(context.base_url + '/customers')
     expect(context.resp.status_code).to_equal(200)
     for customer in context.resp.json():
-        print(customer)
         context.resp = requests.delete(context.base_url + '/customers/' + str(customer["id"]), headers=headers)
         expect(context.resp.status_code).to_equal(204)
     
