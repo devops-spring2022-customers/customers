@@ -218,7 +218,7 @@ class CustomerCollection(Resource):
             app.logger.info('Returning unfiltered list.')
             customers = Customer.all()
 
-        app.logger.info('[%s] Customers returned', len(customers))
+        #app.logger.info('[%s] Customers returned', len(customers))
         results = [customer.serialize() for customer in customers]
         return results, status.HTTP_200_OK
     
