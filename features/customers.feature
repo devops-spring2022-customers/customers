@@ -27,18 +27,19 @@ Scenario: Create a Customer
 
     When I copy the "Id" field
     And I press the "Clear" button
-    Then the "Id" field should be empty
-    And the "First Name" field should be empty
-    And the "Last Name" field should be empty
-    And the "Password" field should be empty
-    And the "Active" field should be empty
-
-    When I paste the "Id" field
+    And I paste the "Id" field
     And I press the "Retrieve" button
     Then I should see "Yuteng" in the "First Name" field
     And I should see "Zhang" in the "Last Name" field
     And I should see "5" in the "UserID" field
     And I should see "true" in the "Active" field
+
+    When I press the "Clear" button
+    Then the "Id" field should be empty
+    And the "First Name" field should be empty
+    And the "Last Name" field should be empty
+    And the "Password" field should be empty
+    And the "Active" field should be empty
 
 Scenario: List all Customers
     When I visit the "Home Page"
