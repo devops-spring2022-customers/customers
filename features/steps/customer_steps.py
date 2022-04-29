@@ -14,7 +14,22 @@ ID_PREFIX = 'customer_'
 
 @when(u'I visit the "Home Page"')
 def step_impl(context):
+<<<<<<< HEAD
     context.driver.get(context.base_url)
+=======
+    context.base_url = os.getenv(
+        'BASE_URL',
+        'http://localhost:8080'
+    )
+    context.resp = requests.get(context.base_url + '/')
+    assert context.resp.status_code == 200
+
+@when(u'I visit the "home page"')
+def step_impl(context):
+    context.driver.get(context.base_url)
+    context.resp = requests.get(context.base_url + '/')
+    # assert context.resp.status_code == 200
+>>>>>>> 8ab99f30026fd8d89cb84625f546a42a54fdb3fd
 
 
 @then('I should see "{message}" in the title')
@@ -59,13 +74,17 @@ def step_impl(context, button):
 
 @then('I should see "{name}" in the results')
 def step_impl(context, name):
-    found = WebDriverWait(context.driver, context.WAIT_SECONDS).until(
-        expected_conditions.text_to_be_present_in_element(
-            (By.ID, 'search_results'),
-            name
-        )
-    )
-    expect(found).to_be(True)
+    # found = WebDriverWait(context.driver, context.WAIT_SECONDS).until(
+    #     expected_conditions.text_to_be_present_in_element(
+    #         (By.ID, 'search_results'),
+    #         name
+    #     )
+    # )
+    # expect(found).to_be(True)
+    element = context.driver.find_element_by_id('search_results')
+    error_msg = "I should see '%s' in '%s'" % (name, element.text)
+    ensure(name in element.text, False, error_msg)
+
 
 @then('I should not see "{name}" in the results')
 def step_impl(context, name):
@@ -75,13 +94,8 @@ def step_impl(context, name):
 
 @then('I should see the message "{message}"')
 def step_impl(context, message):
-    found = WebDriverWait(context.driver, context.WAIT_SECONDS).until(
-        expected_conditions.text_to_be_present_in_element(
-            (By.ID, 'flash_message'),
-            message
-        )
-    )
-    expect(found).to_be(True)
+    msg = "I should see '%s' in '%s'" % (message, context.resp.text)
+    ensure(message in context.resp.text, False, msg)
 
 
 # ##################################################################
@@ -121,6 +135,7 @@ def step_impl(context, text_string, element_name):
             text_string
         )
     )
+    print(found)
     expect(found).to_be(True)
 
 @when('I change "{element_name}" to "{text_string}"')
@@ -138,9 +153,18 @@ def step_impl(context):
     """ Delete all Customers and load new ones """
     headers = {'Content-Type': 'application/json'}
     # list all of the customers and delete them one by one
+<<<<<<< HEAD
     context.resp = requests.get(context.base_url + '/customers')
     expect(context.resp.status_code).to_equal(200)
     for customer in context.resp.json():
+=======
+    context.resp = requests.get(context.base_url + '/customers', headers=headers)
+    #context.resp = requests.get(context.base_url + '/customers', headers=headers)
+    print(context.resp.text)
+    expect(context.resp.status_code).to_equal(200)
+    for customer in context.resp.json():
+        # print(customer)
+>>>>>>> 8ab99f30026fd8d89cb84625f546a42a54fdb3fd
         context.resp = requests.delete(context.base_url + '/customers/' + str(customer["id"]), headers=headers)
         expect(context.resp.status_code).to_equal(204)
     
