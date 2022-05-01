@@ -207,18 +207,14 @@ class Customer(db.Model, PersistentBase):
             self.userid = data.get("userid")
             self.password = data.get("password")
 
-            # if "userid" in data:
-            #     self.userid = data["userid"]
-            # if "password" in data:
-            #     self.password = data["password"]  
-
             self.active = data.get("active")
 
-            address_list = data.get("addresses")
+            address_list = data.get("addresses", [])
+            #address_list = data.get("addresses")
             for json_address in address_list:
                 address = Address()
                 address.deserialize(json_address)
-                self.addresses.append(address) 
+                self.addresses.append(address)
 
         except AttributeError as error:
             raise DataValidationError("Invalid attribute: " + error.args[0])

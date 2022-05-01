@@ -50,6 +50,19 @@ def step_impl(context, element_name):
     #element = context.driver.find_element_by_id(element_id)
     #expect(element.get_attribute('value')).to_be(u'')
 
+@then('the "{element_name}" field should be empty from the "{model}" form')
+def step_impl(context, element_name, model):
+    element_id = ID_PREFIX + model.lower() + '_' + element_name.lower().replace(' ', '_')
+    found = WebDriverWait(context.driver, context.WAIT_SECONDS).until(
+        expected_conditions.text_to_be_present_in_element(
+            (By.ID, element_id),
+            ''
+        )
+    )
+    expect(found).to_be(True)
+    #element = context.driver.find_element_by_id(element_id)
+    #expect(element.get_attribute('value')).to_be(u'')
+
 
 # ##################################################################
 # # This code works because of the following naming convention:
@@ -64,6 +77,11 @@ def step_impl(context, button):
     button_id = button.lower() + '-btn'
     context.driver.find_element_by_id(button_id).click()
 
+@when(u'I press the "{button}" button from the "{model}" form')
+def step_impl(context, button, model):
+    button_id = button.lower() + '-' + model.lower() + '-btn'
+    context.driver.find_element_by_id(button_id).click()
+
 @then('I should see "{name}" in the results')
 def step_impl(context, name):
     found = WebDriverWait(context.driver, context.WAIT_SECONDS).until(
@@ -73,6 +91,17 @@ def step_impl(context, name):
         )
     )
     expect(found).to_be(True)
+
+@then('I should see "{name}" in the results for "{model}"')
+def step_impl(context, name, model):
+    found = WebDriverWait(context.driver, context.WAIT_SECONDS).until(
+        expected_conditions.text_to_be_present_in_element(
+            (By.ID, 'search_results_address'),
+            name
+        )
+    )
+    expect(found).to_be(True)
+
 
 @then('I should not see "{name}" in the results')
 def step_impl(context, name):
@@ -98,9 +127,27 @@ def step_impl(context, element_name):
     context.clipboard = element.get_attribute('value')
     logging.info('Clipboard contains: %s', context.clipboard)
 
+@when('I copy the "{element_name}" field from the "{model}" form')
+def step_impl(context, element_name, model):
+    element_id = ID_PREFIX + model.lower() + "_" + element_name.lower().replace(' ', '_')
+    element = WebDriverWait(context.driver, context.WAIT_SECONDS).until(
+        expected_conditions.presence_of_element_located((By.ID, element_id))
+    )
+    context.clipboard = element.get_attribute('value')
+    logging.info('Clipboard contains: %s', context.clipboard)
+
 @when('I paste the "{element_name}" field')
 def step_impl(context, element_name):
     element_id = ID_PREFIX + element_name.lower().replace(' ', '_')
+    element = WebDriverWait(context.driver, context.WAIT_SECONDS).until(
+        expected_conditions.presence_of_element_located((By.ID, element_id))
+    )
+    element.clear()
+    element.send_keys(context.clipboard)
+
+@when('I paste the "{element_name}" field to "{element_name_form}"')
+def step_impl(context, element_name, element_name_form):
+    element_id = element_name_form.lower().replace(' ', '_')
     element = WebDriverWait(context.driver, context.WAIT_SECONDS).until(
         expected_conditions.presence_of_element_located((By.ID, element_id))
     )
@@ -123,7 +170,6 @@ def step_impl(context, text_string, element_name):
             text_string
         )
     )
-    print(found)
     expect(found).to_be(True)
 
 @when('I change "{element_name}" to "{text_string}"')
