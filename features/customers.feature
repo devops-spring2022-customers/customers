@@ -188,19 +188,19 @@ Scenario: List all Addresses of a Customer
     And I should see "New York" in the "State" field
     And I should see "10012" in the "PostalCode" field
 
-    When I copy the "Id" field from the "Address" form
-    And I press the "Clear" button from the "Address" form
-    And I paste the "Id" field to "Customer Address ID"
-    And I set the "Street" to "500 W 120th St #510"
-    And I set the "City" to "New York City"
-    And I set the "State" to "New York"
-    And I set the "PostalCode" to "10027"
-    And I press the "Create" button from the "Address" form
-    Then I should see the message "Success"
-    And I should see "500 W 120th St #510" in the "Street" field
-    And I should see "New York City" in the "City" field
-    And I should see "New York" in the "State" field
-    And I should see "10027" in the "PostalCode" field
+    # When I copy the "Id" field from the "Address" form
+    # And I press the "Clear" button from the "Address" form
+    # And I paste the "Id" field to "Customer Address ID"
+    # And I set the "Street" to "500 W 120th St #510"
+    # And I set the "City" to "New York City"
+    # And I set the "State" to "New York"
+    # And I set the "PostalCode" to "10027"
+    # And I press the "Create" button from the "Address" form
+    # Then I should see the message "Success"
+    # And I should see "500 W 120th St #510" in the "Street" field
+    # And I should see "New York City" in the "City" field
+    # And I should see "New York" in the "State" field
+    # And I should see "10027" in the "PostalCode" field
 
     # When I copy the "Id" field from the "Address" form
     # And I press the "Clear" button from the "Address" form
@@ -209,9 +209,9 @@ Scenario: List all Addresses of a Customer
     When I press the "Search" button from the "Address" form
     Then I should see the message "Success"
     And I should see "251 Mercer St # 801" in the results for "Address"
-    And I should see "500 W 120th St #510" in the results for "Address"
+    # And I should see "500 W 120th St #510" in the results for "Address"
     And I should see "10012" in the results for "Address"
-    And I should see "10027" in the results for "Address"
+    # And I should see "10027" in the results for "Address"
     And I should not see "2 W Loop Rd" in the results for "Address"
     And I should not see "10044" in the results for "Address"
 
