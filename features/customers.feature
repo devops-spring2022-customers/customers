@@ -202,10 +202,11 @@ Scenario: List all Addresses of a Customer
     And I should see "New York" in the "State" field
     And I should see "10027" in the "PostalCode" field
 
-    When I copy the "Id" field from the "Address" form
-    When I press the "Clear" button from the "Address" form
-    And I paste the "Id" field to "Customer Address ID"
-    And I press the "Search" button from the "Address" form
+    # When I copy the "Id" field from the "Address" form
+    # And I press the "Clear" button from the "Address" form
+    # And I paste the "Id" field to "Customer Address ID"
+    # And I press the "Search" button from the "Address" form
+    When I press the "Search" button from the "Address" form
     Then I should see the message "Success"
     And I should see "251 Mercer St # 801" in the results for "Address"
     And I should see "500 W 120th St #510" in the results for "Address"
