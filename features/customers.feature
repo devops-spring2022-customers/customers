@@ -152,7 +152,8 @@ Scenario: Create an Address
     And I set the "State" to "New York"
     And I set the "PostalCode" to "10012"
     And I press the "Create" button from the "Address" form
-    Then I should see "251 Mercer St # 801" in the "Street" field
+    Then I should see the message "Success"
+    And I should see "251 Mercer St # 801" in the "Street" field
     And I should see "New York City" in the "City" field
     And I should see "New York" in the "State" field
     And I should see "10012" in the "PostalCode" field
@@ -181,7 +182,8 @@ Scenario: List all Addresses of a Customer
     And I set the "State" to "New York"
     And I set the "PostalCode" to "10012"
     And I press the "Create" button from the "Address" form
-    Then I should see "251 Mercer St # 801" in the "Street" field
+    Then I should see the message "Success"
+    And I should see "251 Mercer St # 801" in the "Street" field
     And I should see "New York City" in the "City" field
     And I should see "New York" in the "State" field
     And I should see "10012" in the "PostalCode" field
@@ -194,7 +196,8 @@ Scenario: List all Addresses of a Customer
     And I set the "State" to "New York"
     And I set the "PostalCode" to "10027"
     And I press the "Create" button from the "Address" form
-    Then I should see "500 W 120th St #510" in the "Street" field
+    Then I should see the message "Success"
+    And I should see "500 W 120th St #510" in the "Street" field
     And I should see "New York City" in the "City" field
     And I should see "New York" in the "State" field
     And I should see "10027" in the "PostalCode" field
@@ -203,7 +206,8 @@ Scenario: List all Addresses of a Customer
     When I press the "Clear" button from the "Address" form
     And I paste the "Id" field to "Customer Address ID"
     And I press the "Search" button from the "Address" form
-    Then I should see "251 Mercer St # 801" in the results for "Address"
+    Then I should see the message "Success"
+    And I should see "251 Mercer St # 801" in the results for "Address"
     And I should see "500 W 120th St #510" in the results for "Address"
     And I should see "10012" in the results for "Address"
     And I should see "10027" in the results for "Address"
@@ -227,14 +231,16 @@ Scenario: Update an Address
     And I set the "State" to "New York"
     And I set the "PostalCode" to "10012"
     And I press the "Create" button from the "Address" form
-    Then I should see "251 Mercer St # 801" in the "Street" field
+    Then I should see the message "Success"
+    And I should see "251 Mercer St # 801" in the "Street" field
     And I should see "New York City" in the "City" field
     And I should see "New York" in the "State" field
     And I should see "10012" in the "PostalCode" field
 
     When I set the "Street" to "Modified Street Name"
     And I press the "Update" button from the "Address" form
-    Then I should see "Modified Street Name" in the "Street" field
+    Then I should see the message "Success"
+    And I should see "Modified Street Name" in the "Street" field
     And I should see "New York City" in the "City" field
     And I should see "New York" in the "State" field
     And I should see "10012" in the "PostalCode" field
@@ -256,7 +262,8 @@ Scenario: Delete an Address
     And I set the "State" to "New York"
     And I set the "PostalCode" to "10012"
     And I press the "Create" button from the "Address" form
-    Then I should see "251 Mercer St # 801" in the "Street" field
+    Then I should see the message "Success"
+    And I should see "251 Mercer St # 801" in the "Street" field
     And I should see "New York City" in the "City" field
     And I should see "New York" in the "State" field
     And I should see "10012" in the "PostalCode" field
@@ -264,7 +271,8 @@ Scenario: Delete an Address
     When I press the "Delete" button from the "Address" form
     And I press the "Clear" button
     And I press the "Search" button
-    Then I should not see "251 Mercer St # 801" in the results
+    Then I should see the message "Success"
+    And I should not see "251 Mercer St # 801" in the results
     And I should not see "New York City" in the results
     And I should not see "New York" in the results
     And I should not see "10012" in the results
