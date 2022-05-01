@@ -127,10 +127,10 @@ class Address(db.Model,PersistentBase):
             data (dict): A dictionary containing the resource data
         """
         try:
-            self.street = data["street"]
-            self.city = data["city"]
-            self.state = data["state"]
-            self.postal_code = data["postal_code"]
+            self.street = data.get("street")
+            self.city = data.get("city")
+            self.state = data.get("state")
+            self.postal_code = data.get("postal_code")
         except KeyError as error:
             raise DataValidationError("Invalid Address: missing " + error.args[0])
         except TypeError as error:
@@ -209,8 +209,8 @@ class Customer(db.Model, PersistentBase):
 
             self.active = data.get("active")
 
-            #address_list = data.get("addresses", [])
-            address_list = data.get("addresses")
+            address_list = data.get("addresses", [])
+            #address_list = data.get("addresses")
             for json_address in address_list:
                 address = Address()
                 address.deserialize(json_address)
