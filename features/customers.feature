@@ -138,11 +138,10 @@ Scenario: Perform Actions on Customers
 Scenario: Create an Address
     When I visit the "Home Page"
     And I set the "First Name" to "Yuteng"
-    And I set the "Last Name" to "Zhang"
-    And I set the "UserID" to "5"
-    And I set the "Password" to "123456"
-    And I press the "Create" button
+    And I press the "Search" button
     Then I should see the message "Success"
+    And I should see "Zhang" in the "Last Name" field
+    And I should see "1" in the "UserID" field
 
     When I copy the "Id" field
     And I press the "Clear" button
@@ -168,11 +167,10 @@ Scenario: Create an Address
 Scenario: Update an Address
     When I visit the "Home Page"
     And I set the "First Name" to "Yuteng"
-    And I set the "Last Name" to "Zhang"
-    And I set the "UserID" to "5"
-    And I set the "Password" to "123456"
-    And I press the "Create" button
+    And I press the "Search" button
     Then I should see the message "Success"
+    And I should see "Zhang" in the "Last Name" field
+    And I should see "1" in the "UserID" field
 
     When I copy the "Id" field
     And I press the "Clear" button
@@ -199,11 +197,10 @@ Scenario: Update an Address
 Scenario: Delete an Address
     When I visit the "Home Page"
     And I set the "First Name" to "Yuteng"
-    And I set the "Last Name" to "Zhang"
-    And I set the "UserID" to "5"
-    And I set the "Password" to "123456"
-    And I press the "Create" button
+    And I press the "Search" button
     Then I should see the message "Success"
+    And I should see "Zhang" in the "Last Name" field
+    And I should see "1" in the "UserID" field
 
     When I copy the "Id" field
     And I press the "Clear" button
@@ -214,14 +211,10 @@ Scenario: Delete an Address
     And I set the "PostalCode" to "10012"
     And I press the "Create" button from the "Address" form
     Then I should see the message "Success"
-    And I should see "251 Mercer St # 801" in the "Street" field
-    And I should see "New York City" in the "City" field
-    And I should see "New York" in the "State" field
-    And I should see "10012" in the "PostalCode" field
 
     When I press the "Delete" button from the "Address" form
     And I press the "Clear" button
-    And I press the "Search" button
+    And I press the "Search" button from the "Address" form
     Then I should see the message "Success"
     And I should not see "251 Mercer St # 801" in the results
     And I should not see "New York City" in the results
@@ -231,11 +224,10 @@ Scenario: Delete an Address
 Scenario: List all Addresses of a Customer
     When I visit the "Home Page"
     And I set the "First Name" to "Yuteng"
-    And I set the "Last Name" to "Zhang"
-    And I set the "UserID" to "5"
-    And I set the "Password" to "123456"
-    And I press the "Create" button
+    And I press the "Search" button
     Then I should see the message "Success"
+    And I should see "Zhang" in the "Last Name" field
+    And I should see "1" in the "UserID" field
 
     When I copy the "Id" field
     And I press the "Clear" button
@@ -246,10 +238,6 @@ Scenario: List all Addresses of a Customer
     And I set the "PostalCode" to "10012"
     And I press the "Create" button from the "Address" form
     Then I should see the message "Success"
-    And I should see "251 Mercer St # 801" in the "Street" field
-    And I should see "New York City" in the "City" field
-    And I should see "New York" in the "State" field
-    And I should see "10012" in the "PostalCode" field
 
     When I press the "Search" button from the "Address" form
     Then I should see the message "Success"
