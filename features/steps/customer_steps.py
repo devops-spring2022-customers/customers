@@ -1,6 +1,8 @@
 import os 
 import json
 import requests
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.util.retry import Retry
 from behave import given, when, then
 import logging
 from compare import expect, ensure
@@ -11,6 +13,15 @@ from selenium.webdriver.support import expected_conditions
 import time
 
 ID_PREFIX = 'customer_'
+retry_strategy = Retry(
+    total=3,
+    status_forcelist=[429, 500, 502, 503, 504],
+    method_whitelist=["HEAD", "GET", "OPTIONS"]
+)
+adapter = HTTPAdapter(max_retries=retry_strategy)
+http = requests.Session()
+http.mount("https://", adapter)
+http.mount("http://", adapter)
 
 @when(u'I visit the "Home Page"')
 def step_impl(context):
@@ -187,10 +198,10 @@ def step_impl(context):
     """ Delete all Customers and load new ones """
     headers = {'Content-Type': 'application/json'}
     # list all of the customers and delete them one by one
-    context.resp = requests.get(context.base_url + '/customers')
+    context.resp = http.get(context.base_url + '/customers')
     expect(context.resp.status_code).to_equal(200)
     for customer in context.resp.json():
-        context.resp = requests.delete(context.base_url + '/customers/' + str(customer["id"]), headers=headers)
+        context.resp = http.delete(context.base_url + '/customers/' + str(customer["id"]), headers=headers)
         expect(context.resp.status_code).to_equal(204)
     
     # load the database with new customers
@@ -204,5 +215,5 @@ def step_impl(context):
             "addresses": []
         }
         payload = json.dumps(data)
-        context.resp = requests.post(create_url, data=payload, headers=headers)
+        context.resp = http.post(create_url, data=payload, headers=headers)
         expect(context.resp.status_code).to_equal(201)
